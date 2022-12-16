@@ -1,4 +1,4 @@
-# autobid
+# AutoBid
 
 A new Flutter project.
 

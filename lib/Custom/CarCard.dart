@@ -1,4 +1,4 @@
-import 'Car.dart';
+import '../Classes/Car.dart';
 import 'package:flutter/material.dart';
 
 class CarCard extends StatefulWidget{

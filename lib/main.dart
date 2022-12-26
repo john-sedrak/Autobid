@@ -12,9 +12,9 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: "AutoBid",
-      theme: ThemeData(
-        colorScheme: ColorScheme(
+        title: "AutoBid",
+        theme: ThemeData(
+          colorScheme: ColorScheme(
             brightness: Brightness.light,
             primary: Colors.white,
             onPrimary: Colors.black,
@@ -26,15 +26,14 @@ class MyApp extends StatelessWidget {
             onBackground: Colors.black,
             surface: Colors.white,
             onSurface: Colors.black,
-            ),
-        appBarTheme: AppBarTheme(elevation: 0, backgroundColor: Colors.grey.shade300),
-        scaffoldBackgroundColor: Colors.grey.shade300,
-        
-      ),
-      initialRoute: '/',
-      routes:{
-        '/': (context) => const TabControllerScreen(),
-      }
-    );
+          ),
+          appBarTheme:
+              AppBarTheme(elevation: 0, backgroundColor: Colors.grey.shade300),
+          scaffoldBackgroundColor: Colors.grey.shade300,
+        ),
+        initialRoute: '/',
+        routes: {
+          '/': (context) => const TabControllerScreen(),
+        });
   }
 }

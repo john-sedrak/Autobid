@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "51404455484",
+    "project_id": "autobid-64a4c",
+    "storage_bucket": "autobid-64a4c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:51404455484:android:2b1c169b8f37e2744b8d39",
+        "android_client_info": {
+          "package_name": "com.example.autobid"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "51404455484-14m24rje74mbhq14ue5tj3aonrdq22p8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCObkAnm_o77P1rHzSJJSiKYOeL3cZZ21M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "51404455484-14m24rje74mbhq14ue5tj3aonrdq22p8.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

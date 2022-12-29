@@ -41,10 +41,9 @@ class _FavoriteCardState extends State<FavoriteCard> {
                     flex: 2,
                     child: Padding(
                       padding: const EdgeInsets.all(15),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.max,
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                      child: Wrap(
+                        direction: Axis.horizontal,
+                        alignment: WrapAlignment.center,
                         children: [
                           Text(
                             "${widget.car.brand} ${widget.car.model} ${widget.car.year.toString()}",
@@ -108,7 +107,7 @@ class _FavoriteCardState extends State<FavoriteCard> {
                                           MaterialStateProperty.all(
                                               Colors.pink),
                                       overlayColor: MaterialStateProperty.all(
-                                          Colors.pink.shade200),
+                                          Colors.orange.shade200),
                                       side: MaterialStateProperty.all(
                                           const BorderSide(
                                               width: 1, color: Colors.pink)),
@@ -129,35 +128,21 @@ class _FavoriteCardState extends State<FavoriteCard> {
                                 ),
                                 Expanded(
                                   flex: 3,
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      border: Border.all(
-                                          width: 1, color: Colors.pink),
-                                      color: Colors.white,
-                                      shape: BoxShape.circle,
-                                    ),
-                                    child: IconButton(
+                                  child: IconButton(
                                       icon: const Icon(
                                         Icons.delete_outline,
                                         color: Colors.pink,
                                       ),
-                                      style: ButtonStyle(
-                                          foregroundColor:
-                                              MaterialStateProperty.all(
-                                                  Colors.pink),
-                                          overlayColor:
-                                              MaterialStateProperty.all(
-                                                  Colors.pink.shade200),
-                                          side: MaterialStateProperty.all(
-                                              const BorderSide(
-                                                  width: 1,
-                                                  color: Colors.pink))),
                                       onPressed: () {
                                         print('pls remove');
                                       },
-                                    ),
-                                  ),
-                                )
+                                      style: ButtonStyle(
+                                        side: MaterialStateProperty.all(
+                                            BorderSide(color: Colors.pink)),
+                                        overlayColor: MaterialStateProperty.all(
+                                            Colors.orange.shade200),
+                                      )),
+                                ),
                               ],
                             ),
                           )

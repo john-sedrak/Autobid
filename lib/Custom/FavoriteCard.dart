@@ -30,13 +30,26 @@ class _FavoriteCardState extends State<FavoriteCard> {
         child: SizedBox(
           height: 180,
           child: Card(
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+            elevation: 4,
+            margin: EdgeInsets.all(10),
             color: Colors.white,
             child: Row(
               children: [
                 Expanded(
-                    flex: 1,
-                    child: Image.network(widget.car.carImagePaths[0],
-                        height: 180, fit: BoxFit.contain)),
+                  flex: 1,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(15),
+                        bottomLeft: Radius.circular(15)),
+                    child: Image.network(
+                      widget.car.carImagePaths[0],
+                      height: 180,
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+                ),
                 Expanded(
                     flex: 2,
                     child: Padding(
@@ -107,7 +120,7 @@ class _FavoriteCardState extends State<FavoriteCard> {
                                           MaterialStateProperty.all(
                                               Colors.pink),
                                       overlayColor: MaterialStateProperty.all(
-                                          Colors.orange.shade200),
+                                          Colors.pink.shade200),
                                       side: MaterialStateProperty.all(
                                           const BorderSide(
                                               width: 1, color: Colors.pink)),
@@ -122,27 +135,27 @@ class _FavoriteCardState extends State<FavoriteCard> {
                                     ),
                                   ),
                                 ),
-                                const Expanded(
-                                  flex: 1,
-                                  child: Text(" "),
-                                ),
-                                Expanded(
-                                  flex: 3,
-                                  child: IconButton(
-                                      icon: const Icon(
-                                        Icons.delete_outline,
-                                        color: Colors.pink,
-                                      ),
-                                      onPressed: () {
-                                        print('pls remove');
-                                      },
-                                      style: ButtonStyle(
-                                        side: MaterialStateProperty.all(
-                                            BorderSide(color: Colors.pink)),
-                                        overlayColor: MaterialStateProperty.all(
-                                            Colors.orange.shade200),
-                                      )),
-                                ),
+                                // const Expanded(
+                                //   flex: 1,
+                                //   child: Text(" "),
+                                // ),
+                                // Expanded(
+                                //   flex: 3,
+                                //   child: IconButton(
+                                //       icon: const Icon(
+                                //         Icons.delete_outline,
+                                //         color: Colors.pink,
+                                //       ),
+                                //       onPressed: () {
+                                //         print('pls remove');
+                                //       },
+                                //       style: ButtonStyle(
+                                //         side: MaterialStateProperty.all(
+                                //             BorderSide(color: Colors.pink)),
+                                //         overlayColor: MaterialStateProperty.all(
+                                //             Colors.orange.shade200),
+                                //       )),
+                                // ),
                               ],
                             ),
                           )

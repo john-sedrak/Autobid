@@ -17,7 +17,8 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
   final carsRef = FirebaseFirestore.instance.collection('Cars');
 
   List<Car> favorites = [];
-  List<String> favoriteIds = [];
+
+  List favoriteDocs = [];
   int loaded = 0;
 
   int pageSize = 3;
@@ -55,8 +56,8 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
 
         List<Car> newFavs = [];
 
-        for (int i = 0; i < min(pageSize, favoriteIds.length); i++) {
-          var fav = favoriteIds[i];
+        for (int i = 0; i < min(pageSize, favoriteDocs.length); i++) {
+          var fav = favoriteDocs[i].id;
           DocumentSnapshot carDoc = await carsRef.doc(fav).get();
           Map<String, dynamic> carMap = carDoc.data() as Map<String, dynamic>;
           Car car = mapToCar(fav, carMap);
@@ -83,20 +84,20 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
   }
 
   void addAllFavoriteIds(List firebaseDocReferences) {
-    List<String> newIds = [];
+    List newIds = [];
 
     firebaseDocReferences.forEach((element) {
-      newIds.add(element.id);
+      newIds.add(element);
     });
 
-    favoriteIds = newIds;
+    favoriteDocs = newIds;
   }
 
   void loadMore() async {
     List<Car> newFavs = favorites;
 
-    for (int i = loaded; i < min(loaded + pageSize, favoriteIds.length); i++) {
-      var fav = favoriteIds[i];
+    for (int i = loaded; i < min(loaded + pageSize, favoriteDocs.length); i++) {
+      var fav = favoriteDocs[i].id;
       DocumentSnapshot carDoc = await carsRef.doc(fav).get();
       Map<String, dynamic> carMap = carDoc.data() as Map<String, dynamic>;
       Car car = mapToCar(fav, carMap);
@@ -106,6 +107,21 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
     setState(() {
       favorites = newFavs;
     });
+  }
+
+  void removeFromFavorites(int index) {
+    setState(() {
+      favorites.removeAt(index);
+    });
+
+    String idToRemove = favoriteDocs[index].id;
+    favoriteDocs.removeAt(index);
+
+    final docRef = FirebaseFirestore.instance.collection('Users').doc(userId);
+
+    docRef
+        .update({"favorites": favoriteDocs}).then((value) => print("removed"));
+    loaded--;
   }
 
   @override
@@ -119,22 +135,41 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
   Widget build(BuildContext context) {
     return Container(
         child: ListView.builder(
-      itemCount: favorites.length,
-      itemBuilder: (context, index) => index == favorites.length - 1
-          ? Column(
-              children: [
-                FavoriteCard(
-                  car: favorites[index],
-                ),
-                if (loaded != favoriteIds.length)
-                  ElevatedButton(
-                      onPressed: () => loadMore(), child: Text("Load More"))
-              ],
-            )
-          : FavoriteCard(
-              car: favorites[index],
-            ),
-    )
+            itemCount: favorites.length,
+            itemBuilder: (context, index) => Column(
+                  children: [
+                    Dismissible(
+                      key: Key(favorites[index].id),
+                      direction: DismissDirection.endToStart,
+                      onDismissed: (direction) => removeFromFavorites(index),
+                      background: Container(
+                          color: Colors.red,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Padding(
+                                padding: EdgeInsets.all(10.0),
+                                child: Text(
+                                  "Remove From\n Favorites",
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                            ],
+                          )),
+                      child: FavoriteCard(
+                        car: favorites[index],
+                      ),
+                    ),
+                    if (loaded != favoriteDocs.length &&
+                        index == favorites.length - 1)
+                      ElevatedButton(
+                          onPressed: () => loadMore(), child: Text("Load More"))
+                  ],
+                ))
         //
         // FavoriteCard(
         //     car: Car(

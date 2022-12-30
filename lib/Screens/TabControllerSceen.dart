@@ -25,7 +25,7 @@ class _TabControllerScreenState extends State<TabControllerScreen> {
     'Explore',
     'Chats',
     'Listings',
-    'Favorites'
+    'Favorites',
   ];
 
   int pageIndex = 0;
@@ -40,6 +40,13 @@ class _TabControllerScreenState extends State<TabControllerScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(title: labels[pageIndex]),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          // Add your onPressed code here!
+        },
+        backgroundColor: Colors.pink,
+        child: const Icon(Icons.add),
+      ),
       body: pages[pageIndex],
       bottomNavigationBar: BottomNavigationBar(
         showSelectedLabels: false,

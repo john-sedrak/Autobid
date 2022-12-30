@@ -23,6 +23,8 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
 
   int pageSize = 3;
 
+  bool isLoading = false;
+
   Car mapToCar(String id, Map<String, dynamic> map) {
     List<String> images = [];
     for (var img in map["images"]) {
@@ -45,6 +47,13 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
   }
 
   void getFavorites() {
+    loaded = 0;
+    setState(() {
+      isLoading = true;
+      favorites = [];
+      favoriteDocs = [];
+    });
+
     final docRef = FirebaseFirestore.instance.collection('Users').doc(userId);
 
     docRef.get().then(
@@ -64,20 +73,10 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
           newFavs.add(car);
           loaded++;
         }
-
         setState(() {
           favorites = newFavs;
+          isLoading = false;
         });
-
-        // favs.forEach((fav) async {
-        //   DocumentSnapshot carDoc = await carsRef.doc(fav.id).get();
-        //   Map<String, dynamic> carMap = carDoc.data() as Map<String, dynamic>;
-        //   Car car = mapToCar(fav.id, carMap);
-        //   newFavs.add(car);
-        //   setState(() {
-        //     favorites = newFavs;
-        //   });
-        // });
       },
       onError: (e) => print("Error getting document: $e"),
     );
@@ -94,6 +93,10 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
   }
 
   void loadMore() async {
+    setState(() {
+      isLoading = true;
+    });
+
     List<Car> newFavs = favorites;
 
     for (int i = loaded; i < min(loaded + pageSize, favoriteDocs.length); i++) {
@@ -106,6 +109,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
     }
     setState(() {
       favorites = newFavs;
+      isLoading = false;
     });
   }
 
@@ -133,72 +137,58 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-        child: ListView.builder(
-            itemCount: favorites.length,
-            itemBuilder: (context, index) => Column(
-                  children: [
-                    Dismissible(
-                      key: Key(favorites[index].id),
-                      direction: DismissDirection.endToStart,
-                      onDismissed: (direction) => removeFromFavorites(index),
-                      background: Container(
-                          color: Colors.red,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Padding(
-                                padding: EdgeInsets.all(10.0),
-                                child: Text(
-                                  "Remove From\n Favorites",
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                              ),
-                            ],
-                          )),
-                      child: FavoriteCard(
-                        car: favorites[index],
-                      ),
-                    ),
-                    if (loaded != favoriteDocs.length &&
-                        index == favorites.length - 1)
-                      ElevatedButton(
-                          onPressed: () => loadMore(), child: Text("Load More"))
-                  ],
-                ))
-        //
-        // FavoriteCard(
-        //     car: Car(
-        //         id: 'cid1',
-        //         mileage: 2000,
-        //         bidderID: '',
-        //         sellerID: '',
-        //         brand: 'Mercedes',
-        //         model: 'A-Class',
-        //         year: 2022,
-        //         currentBid: 0,
-        //         startingPrice: 1000000,
-        //         sellerDescription: 'Best Car',
-        //         validUntil: DateTime.utc(2022, 12, 31),
-        //         carImagePaths: [
-        //   'https://assets.bonappetit.com/photos/57af6bea53e63daf11a4e565/16:9/w_1280,c_limit/fattoush.jpg',
-        //   'https://assets.bonappetit.com/photos/57af6bea53e63daf11a4e565/16:9/w_1280,c_limit/fattoush.jpg',
-        //   'https://image.shutterstock.com/image-photo/plate-delicious-chicken-alfredo-on-600w-613083071.jpg',
-        //   'https://assets.bonappetit.com/photos/57af6bea53e63daf11a4e565/16:9/w_1280,c_limit/fattoush.jpg',
-        //   'https://assets.bonappetit.com/photos/57af6bea53e63daf11a4e565/16:9/w_1280,c_limit/fattoush.jpg',
-        //   'https://image.shutterstock.com/image-photo/plate-delicious-chicken-alfredo-on-600w-613083071.jpg',
-        //   'https://assets.bonappetit.com/photos/57af6bea53e63daf11a4e565/16:9/w_1280,c_limit/fattoush.jpg',
-        //   'https://assets.bonappetit.com/photos/57af6bea53e63daf11a4e565/16:9/w_1280,c_limit/fattoush.jpg',
-        //   'https://image.shutterstock.com/image-photo/plate-delicious-chicken-alfredo-on-600w-613083071.jpg',
-        //   'https://assets.bonappetit.com/photos/57af6bea53e63daf11a4e565/16:9/w_1280,c_limit/fattoush.jpg',
-        //   'https://assets.bonappetit.com/photos/57af6bea53e63daf11a4e565/16:9/w_1280,c_limit/fattoush.jpg',
-        //   'https://image.shutterstock.com/image-photo/plate-delicious-chicken-alfredo-on-600w-613083071.jpg'
-        // ]))
-        );
-    ;
+    return isLoading && favorites.isEmpty
+        ? Center(
+            child: CircularProgressIndicator(
+            color: Colors.pink,
+          ))
+        : Container(
+            child: RefreshIndicator(
+            color: Colors.pink,
+            onRefresh: () => Future(getFavorites),
+            child: ListView.builder(
+                itemCount: favorites.length,
+                itemBuilder: (context, index) => Column(
+                      children: [
+                        Dismissible(
+                          key: Key(favorites[index].id),
+                          direction: DismissDirection.endToStart,
+                          onDismissed: (direction) =>
+                              removeFromFavorites(index),
+                          background: Container(
+                              color: Colors.red,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Padding(
+                                    padding: EdgeInsets.all(10.0),
+                                    child: Text(
+                                      "Remove From\n Favorites",
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  ),
+                                ],
+                              )),
+                          child: FavoriteCard(
+                            car: favorites[index],
+                          ),
+                        ),
+                        if (loaded != favoriteDocs.length &&
+                            index == favorites.length - 1)
+                          isLoading
+                              ? Center(
+                                  child: CircularProgressIndicator(
+                                  color: Colors.pink,
+                                ))
+                              : ElevatedButton(
+                                  onPressed: () => loadMore(),
+                                  child: Text("Load More"))
+                      ],
+                    )),
+          ));
   }
 }

@@ -40,14 +40,15 @@ class _TabControllerScreenState extends State<TabControllerScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(title: labels[pageIndex]),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // Add your onPressed code here!
-        },
-        backgroundColor: Colors.pink,
-        child: const Icon(Icons.add),
-      ),
       body: pages[pageIndex],
+      floatingActionButton: pageIndex==0 || pageIndex==2? FloatingActionButton(
+          onPressed: () {
+            // Add your onPressed code here!
+            //open add car 
+          },
+          backgroundColor: Colors.pink,
+          child: const Icon(Icons.add),
+        ):Container(),
       bottomNavigationBar: BottomNavigationBar(
         showSelectedLabels: false,
         showUnselectedLabels: false,

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
-class Car{
-
+class Car {
   final String id;
   final List<String> carImagePaths;
   final double mileage;
@@ -15,9 +14,17 @@ class Car{
   final DateTime validUntil;
   final String sellerDescription;
 
-  Car({required this.id, required this.carImagePaths, required this.mileage, required this.bidderID, required this.sellerID,
-        required this.brand, required this.model, required this.year, required this.currentBid, required this.startingPrice,
-        required this.sellerDescription, required this.validUntil});
-
-
+  Car(
+      {required this.id,
+      required this.carImagePaths,
+      required this.mileage,
+      required this.bidderID,
+      required this.sellerID,
+      required this.brand,
+      required this.model,
+      required this.year,
+      required this.currentBid,
+      required this.startingPrice,
+      required this.sellerDescription,
+      required this.validUntil});
 }

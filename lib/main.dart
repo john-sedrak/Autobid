@@ -1,3 +1,4 @@
+import 'package:autobid/Screens/MessagesScreen.dart';
 import 'package:flutter/material.dart';
 import 'Screens/TabControllerSceen.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -49,23 +50,24 @@ class _MyAppState extends State<MyApp> {
             brightness: Brightness.light,
             primary: Colors.white,
             onPrimary: Colors.black,
-            secondary: Colors.pink.shade300,
+            secondary: Colors.pink,
             onSecondary: Colors.white,
             error: Colors.white,
-            onError: Colors.pink.shade300,
+            onError: Colors.pink,
             background: Colors.grey.shade300,
             onBackground: Colors.black,
             surface: Colors.white,
             onSurface: Colors.black,
-          ),
-          appBarTheme:
-              AppBarTheme(elevation: 0, backgroundColor: Colors.grey.shade300),
-          scaffoldBackgroundColor: Colors.grey.shade300,
-          //useMaterial3: true
-        ),
-        initialRoute: '/',
-        routes: {
-          '/': (context) => const TabControllerScreen(),
-        });
+            ),
+        appBarTheme: AppBarTheme(elevation: 0, backgroundColor: Colors.grey.shade300),
+        scaffoldBackgroundColor: Colors.grey.shade300,
+        //useMaterial3: true
+      ),
+      initialRoute: '/',
+      routes:{
+        '/': (context) => const TabControllerScreen(),
+        '/messages': (context) => MessagesScreen()
+      }
+    );
   }
 }

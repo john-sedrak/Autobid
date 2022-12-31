@@ -60,11 +60,9 @@ class _ChatsScreenState extends State<ChatsScreen> {
 
                     return ListView.builder(
                       itemBuilder: (context, index) {
-                        var chat = chats[index].data();
-                        List chatters = chat['chatters'];
-                        int otherChatterIndex = 1- chatters.indexWhere((element) => element != userRef);
-                        
-                        return ChatTile(chatRef: chat['chatters'][otherChatterIndex]);
+                        var chat = chats[index];
+                        // print(chat.reference.collection("Texts").snapshots());
+                        return ChatTile(chatSnapshot: chat);
                       },
                       itemCount: chats.length,
                     );

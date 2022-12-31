@@ -1,3 +1,4 @@
+import 'package:autobid/Screens/MessagesScreen.dart';
 import 'package:flutter/material.dart';
 
 import 'Screens/TabControllerSceen.dart';
@@ -18,10 +19,10 @@ class MyApp extends StatelessWidget {
             brightness: Brightness.light,
             primary: Colors.white,
             onPrimary: Colors.black,
-            secondary: Colors.pink.shade300,
+            secondary: Colors.pink,
             onSecondary: Colors.white,
             error: Colors.white,
-            onError: Colors.pink.shade300,
+            onError: Colors.pink,
             background: Colors.grey.shade300,
             onBackground: Colors.black,
             surface: Colors.white,
@@ -34,6 +35,7 @@ class MyApp extends StatelessWidget {
       initialRoute: '/',
       routes:{
         '/': (context) => const TabControllerScreen(),
+        '/messages': (context) => MessagesScreen()
       }
     );
   }

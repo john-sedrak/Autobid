@@ -212,7 +212,7 @@ class _BiddingScreenState extends State<BiddingScreen> {
     }
 
     String userId = "My ID";
-    double oldBid = car!.bidderID == '' ? car.startingPrice : car.currentBid;
+    double oldBid = car.bidderID == '' ? car.startingPrice : car.currentBid;
     double minPossibleBid =
         car.bidderID == '' ? car.startingPrice : car.currentBid + 1;
 

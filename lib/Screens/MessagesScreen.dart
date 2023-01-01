@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:autobid/Utilities/TimeManager.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
@@ -29,9 +30,15 @@ class MessagesScreen extends StatelessWidget {
     Column buildMessage(Map<String, dynamic> text, bool isLastForDay){
 
       bool isMyMessage = text['sender'] != (routeArgs['otherChatter'] as DocumentSnapshot).reference; 
-      var messageTime = (text['timestamp'] as Timestamp).toDate();
-      String time = "${messageTime.hour}:${messageTime.minute<10?"0${messageTime.minute}":messageTime.minute}";
-      String date = "${messageTime.day<10?"0${messageTime.day}":messageTime.day}/${messageTime.month<10?"0${messageTime.month}":messageTime.month}/${messageTime.year}";
+      var timestamp = text['timestamp'];
+      String time = TimeManager.messageTime(timestamp);
+      String date;
+      if(TimeManager.isToday(timestamp)){
+        date = "Today";
+      }
+      else{
+        date = TimeManager.messageDate(timestamp);
+      }
 
       return Column(
         crossAxisAlignment: isMyMessage?CrossAxisAlignment.end: CrossAxisAlignment.start,

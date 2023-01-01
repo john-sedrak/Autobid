@@ -44,9 +44,11 @@ class _FavoriteCardState extends State<FavoriteCard> {
                         topLeft: Radius.circular(15),
                         bottomLeft: Radius.circular(15)),
                     child: Image.network(
-                      widget.car.carImagePaths[0],
+                      widget.car.carImagePaths.isEmpty
+                          ? "https://craftsnippets.com/articles_images/placeholder/placeholder.jpg"
+                          : widget.car.carImagePaths[0],
                       height: 180,
-                      fit: BoxFit.contain,
+                      fit: BoxFit.cover,
                     ),
                   ),
                 ),

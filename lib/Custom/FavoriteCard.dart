@@ -135,27 +135,6 @@ class _FavoriteCardState extends State<FavoriteCard> {
                                     ),
                                   ),
                                 ),
-                                // const Expanded(
-                                //   flex: 1,
-                                //   child: Text(" "),
-                                // ),
-                                // Expanded(
-                                //   flex: 3,
-                                //   child: IconButton(
-                                //       icon: const Icon(
-                                //         Icons.delete_outline,
-                                //         color: Colors.pink,
-                                //       ),
-                                //       onPressed: () {
-                                //         print('pls remove');
-                                //       },
-                                //       style: ButtonStyle(
-                                //         side: MaterialStateProperty.all(
-                                //             BorderSide(color: Colors.pink)),
-                                //         overlayColor: MaterialStateProperty.all(
-                                //             Colors.orange.shade200),
-                                //       )),
-                                // ),
                               ],
                             ),
                           )

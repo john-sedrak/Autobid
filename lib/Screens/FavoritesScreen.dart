@@ -64,7 +64,6 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
         addAllFavoriteIds(favs);
 
         List<Car> newFavs = [];
-
         for (int i = 0; i < min(pageSize, favoriteDocs.length); i++) {
           var fav = favoriteDocs[i].id;
           DocumentSnapshot carDoc = await carsRef.doc(fav).get();

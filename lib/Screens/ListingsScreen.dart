@@ -5,14 +5,6 @@ class ListingsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: FloatingActionButton(
-        onPressed: () {
-          // Add your onPressed code here!
-        },
-        backgroundColor: Colors.pink,
-        child: const Icon(Icons.add),
-      ),
-    );
+    return Container();
   }
 }

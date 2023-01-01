@@ -36,19 +36,24 @@ class _TabControllerScreenState extends State<TabControllerScreen> {
     });
   }
 
+  void goToAddCar(BuildContext context) {
+    Navigator.of(context).pushNamed('/addCar');
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(title: labels[pageIndex]),
       body: pages[pageIndex],
-      floatingActionButton: pageIndex==0 || pageIndex==2? FloatingActionButton(
-          onPressed: () {
-            // Add your onPressed code here!
-            //open add car 
-          },
-          backgroundColor: Colors.pink,
-          child: const Icon(Icons.add),
-        ):Container(),
+      floatingActionButton: pageIndex == 0 || pageIndex == 2
+          ? FloatingActionButton(
+              onPressed: () {
+                goToAddCar(context);
+              },
+              backgroundColor: Colors.pink,
+              child: const Icon(Icons.add),
+            )
+          : Container(),
       bottomNavigationBar: BottomNavigationBar(
         showSelectedLabels: false,
         showUnselectedLabels: false,

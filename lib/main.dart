@@ -1,3 +1,4 @@
+import 'package:autobid/Screens/AddCarScreen.dart';
 import 'package:flutter/material.dart';
 import 'Screens/TabControllerSceen.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -66,6 +67,7 @@ class _MyAppState extends State<MyApp> {
         initialRoute: '/',
         routes: {
           '/': (context) => const TabControllerScreen(),
+          '/addCar': (context) => const AddCarScreen()
         });
   }
 }

@@ -171,8 +171,9 @@ class _BiddingScreenState extends State<BiddingScreen> {
           //   child: const Text('OK'),
           // ),
           ElevatedButton(
-            onPressed: () => updateBid(context).then((value) {
+            onPressed: () => updateBid(context).then((value) async {
               inputController.clear();
+              await refreshCar();
               setState(() {
                 isExpanded = !isExpanded;
                 errorText = null;
@@ -433,7 +434,19 @@ class _BiddingScreenState extends State<BiddingScreen> {
                                             ),
                                             TextField(
                                               decoration: InputDecoration(
-                                                  border: OutlineInputBorder(),
+                                                  floatingLabelStyle: TextStyle(
+                                                      color: errorText == null
+                                                          ? Colors.blueGrey
+                                                          : Colors.red),
+                                                  border: OutlineInputBorder(
+                                                      borderSide: BorderSide(
+                                                          color: Colors
+                                                              .blueGrey)),
+                                                  focusedBorder:
+                                                      OutlineInputBorder(
+                                                          borderSide: BorderSide(
+                                                              color: Colors
+                                                                  .blueGrey)),
                                                   labelText: "Bid in EGP",
                                                   errorText: errorText),
                                               onChanged: (value) =>

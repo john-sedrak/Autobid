@@ -1,3 +1,7 @@
+import 'package:autobid/Classes/User.dart';
+import 'package:autobid/Utils/utils.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 import '../Classes/Car.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
@@ -15,11 +19,20 @@ class _CarCardState extends State<CarCard> {
   bool isFav = false;
   int activePage = 0;
   late PageController _pageController;
+  bool _userLoaded = false;
+  late User seller;
+  late DocumentSnapshot sellerSnapshot;
+  //update this code when authentication is complete
+  String userId = "RoFvf4QhbYY3dybd0nDulXzxLcK2";
+
+  
 
   @override
   void initState() {
     super.initState();
     _pageController = PageController(viewportFraction: 1, initialPage: 0);
+    getSellerUser();
+    
   }
 
   void goToBiddingScreen(BuildContext context) {
@@ -27,10 +40,55 @@ class _CarCardState extends State<CarCard> {
         .pushNamed('/bidRoute', arguments: {'car': widget.car});
   }
 
+  void goToChatScreen(BuildContext context) {
+    Navigator.of(context)
+        .pushNamed('/messages', arguments: {'otherChatter': sellerSnapshot});
+  }
+
+  User mapToUserWithoutFavorites(String id, Map<String, dynamic> map) {
+    print("Username: ${map["name"].toString()}");
+    return User(
+        id: id,
+        favorites: [],
+        name: map["name"].toString(),
+        email: map["email"].toString(),
+        phoneNumber: map["phoneNumber"].toString()
+    );
+  }
+
+  Future<void> getSellerUser() async{
+      try{
+      var sellerID = widget.car.sellerID;
+
+      final sellerRef = FirebaseFirestore.instance.collection('Users').doc(sellerID);
+      
+
+      DocumentSnapshot d = await sellerRef.get();
+
+      setState(() {
+        sellerSnapshot = d;
+        Map<String, dynamic> sellerMap = sellerSnapshot.data() as Map<String, dynamic>;
+
+        seller = mapToUserWithoutFavorites(sellerSnapshot.id, sellerMap);
+        print(seller.name.substring(0,1));
+        _userLoaded = true;
+      });
+      }catch(err){
+        print(err);
+      }
+  }
+
+  Future<void> addToFavorites() async{
+
+    
+
+
+  }
+
   List<Widget> indicators(imagesLength, currentIndex) {
     var apparentLength;
     var apparentIndex;
-    var shrinkMode;
+    var shrinkMode = 4;
     if (imagesLength > 7) {
       apparentLength = 7;
       if (currentIndex <= 3) {
@@ -187,7 +245,7 @@ class _CarCardState extends State<CarCard> {
                                     ? '${widget.car.startingPrice.round()} EGP'
                                     : '${widget.car.currentBid.round()} EGP'),
                                 style: TextStyle(
-                                    fontSize: 24, fontWeight: FontWeight.bold),
+                                    fontSize: 20, fontWeight: FontWeight.bold),
                               ),
                               Text(
                                   'Valid until ' +
@@ -209,7 +267,7 @@ class _CarCardState extends State<CarCard> {
                                   backgroundColor: Colors.pink,
                                   radius: 25,
                                   child: Text(
-                                    'U',
+                                    _userLoaded? seller.name.substring(0,1):' ',
                                     style: TextStyle(
                                         fontSize: 25, color: Colors.white),
                                   )),
@@ -220,7 +278,11 @@ class _CarCardState extends State<CarCard> {
                                   child: IconButton(
                                       icon: const Icon(Icons.chat_rounded,
                                           color: Colors.white),
-                                      onPressed: () {},
+                                      onPressed: () {
+                                        if(_userLoaded){
+                                          goToChatScreen(context);
+                                        }
+                                      },
                                       iconSize: 15)),
                               Text('   '),
                               CircleAvatar(
@@ -229,7 +291,11 @@ class _CarCardState extends State<CarCard> {
                                   child: IconButton(
                                       icon: const Icon(Icons.phone,
                                           color: Colors.white),
-                                      onPressed: () {},
+                                      onPressed: () async{
+                                        if(_userLoaded){
+                                          Utils.dialPhoneNumber(seller.phoneNumber);
+                                        }
+                                      },
                                       iconSize: 15)),
                             ],
                           ),

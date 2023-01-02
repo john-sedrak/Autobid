@@ -1,14 +1,17 @@
+import 'package:flutter/material.dart';
+
 class User {
   final String id;
+  final List<String> favorites;
+  final String name;
   final String email;
   final String phoneNumber;
-  final String name;
-  final List<String> favorites;
 
-  User(
-      {required this.id,
-      required this.email,
-      required this.phoneNumber,
-      required this.name,
-      required this.favorites});
+  User({
+    required this.id,
+    required this.favorites,
+    required this.name,
+    required this.email,
+    required this.phoneNumber,
+  });
 }

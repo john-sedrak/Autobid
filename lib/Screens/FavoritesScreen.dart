@@ -155,7 +155,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                 itemBuilder: (context, index) => Column(
                       children: [
                         Dismissible(
-                          key: Key(favorites[index].toString()),
+                          key: Key(favoriteIds[index]),
                           direction: DismissDirection.endToStart,
                           onDismissed: (direction) =>
                               removeFromFavorites(index),

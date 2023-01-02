@@ -13,9 +13,9 @@ class FavoriteCard extends StatefulWidget {
 }
 
 class _FavoriteCardState extends State<FavoriteCard> {
-  void goToBiddingScreen(BuildContext context) {
-    Navigator.of(context)
-        .pushNamed('/bidRoute', arguments: {'car': widget.car});
+  void goToBiddingScreen(BuildContext context, {bool isExpanded = false}) {
+    Navigator.of(context).pushNamed('/bidRoute',
+        arguments: {'car': widget.car, 'isExpanded': isExpanded});
   }
 
   String addCommas(String s) {
@@ -115,7 +115,8 @@ class _FavoriteCardState extends State<FavoriteCard> {
                                   flex: 8,
                                   child: OutlinedButton(
                                     onPressed: () {
-                                      goToBiddingScreen(context);
+                                      goToBiddingScreen(context,
+                                          isExpanded: true);
                                     },
                                     style: ButtonStyle(
                                       foregroundColor:

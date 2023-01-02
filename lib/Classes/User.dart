@@ -7,11 +7,11 @@ class User {
   final String email;
   final String phoneNumber;
 
-  User(
-      {required this.id,
-      required this.favorites,
-      required this.name,
-      required this.email,
-      required this.phoneNumber,
-      });
+  User({
+    required this.id,
+    required this.favorites,
+    required this.name,
+    required this.email,
+    required this.phoneNumber,
+  });
 }

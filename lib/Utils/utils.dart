@@ -1,5 +1,6 @@
 import 'package:autobid/Classes/Car.dart';
 import 'package:autobid/Classes/User.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class Utils {
@@ -45,8 +46,23 @@ class Utils {
         name: map["name"].toString(),
         email: map["email"].toString(),
         phoneNumber: map["phone"].toString());
-
-    print(u);
     return u;
+  }
+
+  static Future<void> addOrRemoveFromFavorites(User u, String carId) {
+    List<String> favIds = u.favorites;
+
+    int index = favIds.indexOf(carId);
+    if (index == -1) {
+      //add to fav
+      favIds.add(carId);
+    } else {
+      //remove from fav
+      favIds.removeAt(index);
+    }
+    return FirebaseFirestore.instance
+        .collection('Users')
+        .doc(u.id)
+        .update({"favorites": favIds});
   }
 }

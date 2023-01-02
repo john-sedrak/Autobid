@@ -18,6 +18,7 @@ class _BiddingScreenState extends State<BiddingScreen> {
   late PageController _pageController;
 
   String userID = "RoFvf4QhbYY3dybd0nDulXzxLcK2";
+  User? currentUser;
 
   User? seller;
 
@@ -25,10 +26,33 @@ class _BiddingScreenState extends State<BiddingScreen> {
 
   Car? carObj;
 
+  bool isFav = false;
+
   @override
   void initState() {
     super.initState();
+    addToFavorites();
+    //--------------remove when auth-----------------------
+    FirebaseFirestore.instance
+        .collection('Users')
+        .doc(userID)
+        .get()
+        .then((snap) {
+      Map<String, dynamic> curMap = snap.data() as Map<String, dynamic>;
+      setState(() {
+        currentUser = Utils.mapToUser(userID, curMap);
+      });
+    });
+    //---------------------------------------------------------
     _pageController = PageController(viewportFraction: 1, initialPage: 0);
+  }
+
+  Future<void> addToFavorites() async {
+    final usersRef = FirebaseFirestore.instance.collection('Users');
+    DocumentSnapshot userDoc = await usersRef.doc(userID).get();
+    Map<String, dynamic> userMap = userDoc.data() as Map<String, dynamic>;
+    User currentUser = Utils.mapToUser(userID, userMap);
+    // print(currentUser.favorites);
   }
 
   List<Widget> indicators(imagesLength, currentIndex) {
@@ -97,7 +121,7 @@ class _BiddingScreenState extends State<BiddingScreen> {
     });
     final docRef =
         FirebaseFirestore.instance.collection('Cars').doc(carObj!.id);
-    print(carObj!.id);
+    // print(carObj!.id);
 //NEED TO NOTIFY OR SEND A PUSH NOTIFICATION TO OLD BIDDER
     Navigator.pop(ctx, 'OK');
     return docRef.update(
@@ -108,11 +132,11 @@ class _BiddingScreenState extends State<BiddingScreen> {
     setState(() {
       isExpanded = !isExpanded;
     });
-    print(isExpanded);
+    // print(isExpanded);
   }
 
   void confirmBid(BuildContext ctx) {
-    print("confirm click");
+    // print("confirm click");
     displayDialog(ctx);
   }
 
@@ -190,10 +214,11 @@ class _BiddingScreenState extends State<BiddingScreen> {
     );
   }
 
+  bool onStart = true;
   @override
   Widget build(BuildContext context) {
     final routeArgs =
-        ModalRoute.of(context)!.settings.arguments as Map<String, Car>;
+        ModalRoute.of(context)!.settings.arguments as Map<String, Object>;
 
     Car car = routeArgs['car'] as Car;
 
@@ -209,11 +234,24 @@ class _BiddingScreenState extends State<BiddingScreen> {
       car = carObj!;
     }
 
+    if (currentUser != null && currentUser!.favorites.contains(car.id)) {
+      setState(() {
+        isFav = true;
+      });
+    }
+
     double oldBid = car.bidderID == '' ? car.startingPrice : car.currentBid;
     double minPossibleBid =
         car.bidderID == '' ? car.startingPrice : car.currentBid + 1;
-
     bool isMyBid = car.bidderID == userID;
+
+    var isExp = routeArgs['isExpanded'];
+    if (onStart && !isMyBid && isExp != null) {
+      setState(() {
+        isExpanded = isExp as bool;
+      });
+      onStart = false;
+    }
 
     void checkErrorText() {
       if (inputController.text == "") {
@@ -288,7 +326,44 @@ class _BiddingScreenState extends State<BiddingScreen> {
                             ],
                           )
                         ]),
-                      )
+                      ),
+                      Positioned.fill(
+                          bottom: 0,
+                          child: ClipRRect(
+                              borderRadius: const BorderRadius.only(
+                                  topLeft: Radius.circular(15),
+                                  topRight: Radius.circular(15)),
+                              child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        children: [
+                                          Container(
+                                            margin: EdgeInsets.all(15),
+                                            child: CircleAvatar(
+                                              radius: 20,
+                                              backgroundColor: Colors.white,
+                                              child: IconButton(
+                                                onPressed: () {
+                                                  Utils.addOrRemoveFromFavorites(
+                                                          currentUser!, car.id)
+                                                      .then((value) =>
+                                                          setState(() {
+                                                            isFav = !isFav;
+                                                          }));
+                                                },
+                                                icon: Icon(
+                                                    isFav
+                                                        ? Icons.star
+                                                        : Icons.star_border,
+                                                    color: Colors.amber),
+                                              ),
+                                            ),
+                                          ),
+                                        ])
+                                  ])))
                     ]),
 
                     //other then images

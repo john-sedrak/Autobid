@@ -32,9 +32,9 @@ class _CarCardState extends State<CarCard> {
     getSellerUser();
   }
 
-  void goToBiddingScreen(BuildContext context) {
-    Navigator.of(context)
-        .pushNamed('/bidRoute', arguments: {'car': widget.car});
+  void goToBiddingScreen(BuildContext context, {bool isExpanded = false}) {
+    Navigator.of(context).pushNamed('/bidRoute',
+        arguments: {'car': widget.car, 'isExpanded': isExpanded});
   }
 
   void goToChatScreen(BuildContext context) {
@@ -76,7 +76,15 @@ class _CarCardState extends State<CarCard> {
     }
   }
 
-  Future<void> addToFavorites() async {}
+  Future<void> addToFavorites() async {
+//remove after auth is added
+    // DocumentSnapshot snap =
+    //     await FirebaseFirestore.instance.collection('Users').doc(userId).get();
+    // Map<String, dynamic> curMap = snap.data() as Map<String, dynamic>;
+    // User curUser = Utils.mapToUser(userId, curMap);
+//----------------
+    //Utils.addOrRemoveFromFavorites(curUser, widget.car.id);
+  }
 
   List<Widget> indicators(imagesLength, currentIndex) {
     var apparentLength;
@@ -302,7 +310,7 @@ class _CarCardState extends State<CarCard> {
                             style: TextStyle(fontSize: 20, color: Colors.white),
                           ),
                           onPressed: () {
-                            goToBiddingScreen(context);
+                            goToBiddingScreen(context, isExpanded: true);
                           },
                           style: ButtonStyle(
                             backgroundColor:

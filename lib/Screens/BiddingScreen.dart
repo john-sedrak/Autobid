@@ -212,7 +212,6 @@ class _BiddingScreenState extends State<BiddingScreen> {
       car = carObj!;
     }
 
-    String userId = "My ID";
     double oldBid = car.bidderID == '' ? car.startingPrice : car.currentBid;
     double minPossibleBid =
         car.bidderID == '' ? car.startingPrice : car.currentBid + 1;
@@ -224,7 +223,7 @@ class _BiddingScreenState extends State<BiddingScreen> {
         name: "Adam Smith",
         favorites: ["123", "456"]);
 
-    bool isMyBid = car.bidderID == userId;
+    bool isMyBid = car.bidderID == userID;
 
     void checkErrorText() {
       if (inputController.text == "") {

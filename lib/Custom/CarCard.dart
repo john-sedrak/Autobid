@@ -25,14 +25,11 @@ class _CarCardState extends State<CarCard> {
   //update this code when authentication is complete
   String userId = "RoFvf4QhbYY3dybd0nDulXzxLcK2";
 
-  
-
   @override
   void initState() {
     super.initState();
     _pageController = PageController(viewportFraction: 1, initialPage: 0);
     getSellerUser();
-    
   }
 
   void goToBiddingScreen(BuildContext context) {
@@ -52,38 +49,34 @@ class _CarCardState extends State<CarCard> {
         favorites: [],
         name: map["name"].toString(),
         email: map["email"].toString(),
-        phoneNumber: map["phoneNumber"].toString()
-    );
+        phoneNumber: map["phoneNumber"].toString());
   }
 
-  Future<void> getSellerUser() async{
-      try{
+  Future<void> getSellerUser() async {
+    try {
       var sellerID = widget.car.sellerID;
 
-      final sellerRef = FirebaseFirestore.instance.collection('Users').doc(sellerID);
-      
+      final sellerRef =
+          FirebaseFirestore.instance.collection('Users').doc(sellerID);
 
       DocumentSnapshot d = await sellerRef.get();
 
       setState(() {
         sellerSnapshot = d;
-        Map<String, dynamic> sellerMap = sellerSnapshot.data() as Map<String, dynamic>;
+        Map<String, dynamic> sellerMap =
+            sellerSnapshot.data() as Map<String, dynamic>;
 
-        seller = mapToUserWithoutFavorites(sellerSnapshot.id, sellerMap);
-        print(seller.name.substring(0,1));
+        seller = Utils.mapToUser(sellerSnapshot.id, sellerMap);
+        //print(seller.favorites);
+        print(seller.name.substring(0, 1));
         _userLoaded = true;
       });
-      }catch(err){
-        print(err);
-      }
+    } catch (err) {
+      print(err);
+    }
   }
 
-  Future<void> addToFavorites() async{
-
-    
-
-
-  }
+  Future<void> addToFavorites() async {}
 
   List<Widget> indicators(imagesLength, currentIndex) {
     var apparentLength;
@@ -267,7 +260,9 @@ class _CarCardState extends State<CarCard> {
                                   backgroundColor: Colors.pink,
                                   radius: 25,
                                   child: Text(
-                                    _userLoaded? seller.name.substring(0,1):' ',
+                                    _userLoaded
+                                        ? seller.name.substring(0, 1)
+                                        : ' ',
                                     style: TextStyle(
                                         fontSize: 25, color: Colors.white),
                                   )),
@@ -279,7 +274,7 @@ class _CarCardState extends State<CarCard> {
                                       icon: const Icon(Icons.chat_rounded,
                                           color: Colors.white),
                                       onPressed: () {
-                                        if(_userLoaded){
+                                        if (_userLoaded) {
                                           goToChatScreen(context);
                                         }
                                       },
@@ -291,9 +286,10 @@ class _CarCardState extends State<CarCard> {
                                   child: IconButton(
                                       icon: const Icon(Icons.phone,
                                           color: Colors.white),
-                                      onPressed: () async{
-                                        if(_userLoaded){
-                                          Utils.dialPhoneNumber(seller.phoneNumber);
+                                      onPressed: () async {
+                                        if (_userLoaded) {
+                                          Utils.dialPhoneNumber(
+                                              seller.phoneNumber);
                                         }
                                       },
                                       iconSize: 15)),

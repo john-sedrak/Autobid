@@ -2,7 +2,6 @@ import 'dart:math';
 import 'package:autobid/Classes/Car.dart';
 import 'package:autobid/Custom/FavoriteCard.dart';
 import 'package:flutter/material.dart';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class FavoritesScreen extends StatefulWidget {

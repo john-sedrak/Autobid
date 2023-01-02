@@ -1,6 +1,7 @@
 import 'package:autobid/Classes/Car.dart';
 import 'package:autobid/Classes/User.dart';
 import 'package:autobid/Custom/CustomAppBar.dart';
+import 'package:autobid/Utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
@@ -17,6 +18,8 @@ class _BiddingScreenState extends State<BiddingScreen> {
   late PageController _pageController;
 
   String userID = "RoFvf4QhbYY3dybd0nDulXzxLcK2";
+
+  User? seller;
 
   var inputController = TextEditingController();
 
@@ -74,36 +77,14 @@ class _BiddingScreenState extends State<BiddingScreen> {
   }
 
   bool isExpanded = false;
-
   String? errorText;
   bool isLoading = false;
-
-  Car mapToCar(String id, Map<String, dynamic> map) {
-    List<String> images = [];
-    for (var img in map["images"]) {
-      images.add(img.toString());
-    }
-
-    return Car(
-        id: id,
-        carImagePaths: images,
-        mileage: double.parse(map["mileage"].toString()),
-        bidderID: map["bidderID"].toString(),
-        sellerID: map["sellerID"].toString(),
-        brand: map["brand"].toString(),
-        model: map["model"].toString(),
-        year: int.parse(map["year"].toString()),
-        currentBid: double.parse(map["currentBid"].toString()),
-        startingPrice: double.parse(map["startingPrice"].toString()),
-        sellerDescription: map["description"].toString(),
-        validUntil: map["validUntil"].toDate());
-  }
 
   Future<void> refreshCar() {
     final carsRef = FirebaseFirestore.instance.collection('Cars');
     return carsRef.doc(carObj!.id).get().then((carDoc) {
       Map<String, dynamic> carMap = carDoc.data() as Map<String, dynamic>;
-      Car carTmp = mapToCar(carObj!.id, carMap);
+      Car carTmp = Utils.mapToCar(carObj!.id, carMap);
       setState(() {
         carObj = carTmp;
       });
@@ -133,6 +114,18 @@ class _BiddingScreenState extends State<BiddingScreen> {
   void confirmBid(BuildContext ctx) {
     print("confirm click");
     displayDialog(ctx);
+  }
+
+  Future<void> getSeller(String sellerId) {
+    final usersRef = FirebaseFirestore.instance.collection('Users');
+
+    return usersRef.doc(sellerId).get().then((userDoc) {
+      Map<String, dynamic> userMap = userDoc.data() as Map<String, dynamic>;
+      User sellerTmp = Utils.mapToUser(sellerId, userMap);
+      setState(() {
+        seller = sellerTmp;
+      });
+    });
   }
 
   Future<String?> displayDialog(BuildContext ctx) {
@@ -207,7 +200,11 @@ class _BiddingScreenState extends State<BiddingScreen> {
     if (carObj == null) {
       setState(() {
         carObj = car;
+        isLoading = true;
       });
+      getSeller(car.sellerID).then((value) => setState(() {
+            isLoading = false;
+          }));
     } else {
       car = carObj!;
     }
@@ -215,13 +212,6 @@ class _BiddingScreenState extends State<BiddingScreen> {
     double oldBid = car.bidderID == '' ? car.startingPrice : car.currentBid;
     double minPossibleBid =
         car.bidderID == '' ? car.startingPrice : car.currentBid + 1;
-
-    User seller = new User(
-        id: "123",
-        email: "email@email.com",
-        phoneNumber: "0123456",
-        name: "Adam Smith",
-        favorites: ["123", "456"]);
 
     bool isMyBid = car.bidderID == userID;
 
@@ -596,14 +586,86 @@ class _BiddingScreenState extends State<BiddingScreen> {
                                         '${car.sellerDescription}\n',
                                         style: TextStyle(fontSize: 17),
                                       ),
-                                      const Text("Seller",
-                                          textAlign: TextAlign.left,
-                                          style: TextStyle(
-                                              color: Colors.blueGrey,
-                                              fontSize: 16)),
-                                      Text(
-                                        '${seller.name}',
-                                        style: TextStyle(fontSize: 17),
+                                      Container(
+                                        margin: EdgeInsets.only(bottom: 5),
+                                        child: const Text("Seller",
+                                            textAlign: TextAlign.left,
+                                            style: TextStyle(
+                                                color: Colors.blueGrey,
+                                                fontSize: 16)),
+                                      ),
+                                      Row(
+                                        children: [
+                                          CircleAvatar(
+                                              backgroundColor: Colors.pink,
+                                              radius: 20,
+                                              child: Text(
+                                                seller != null
+                                                    ? seller!.name
+                                                        .substring(0, 1)
+                                                    : ' ',
+                                                style: TextStyle(
+                                                    fontSize: 25,
+                                                    color: Colors.white),
+                                              )),
+                                          Text('   '),
+                                          Text(
+                                            '${seller?.name}',
+                                            style: TextStyle(fontSize: 17),
+                                          ),
+                                        ],
+                                      ),
+                                      Container(
+                                        margin: EdgeInsets.only(
+                                            top: 10, bottom: 10),
+                                        child: const Text("Contact Seller",
+                                            textAlign: TextAlign.left,
+                                            style: TextStyle(
+                                                color: Colors.blueGrey,
+                                                fontSize: 16)),
+                                      ),
+                                      Container(
+                                        margin: EdgeInsets.only(bottom: 10),
+                                        child: Row(
+                                          children: [
+                                            CircleAvatar(
+                                                backgroundColor: Colors.green,
+                                                radius: 18,
+                                                child: IconButton(
+                                                    icon: const Icon(
+                                                        Icons.phone,
+                                                        color: Colors.white),
+                                                    onPressed: () async {
+                                                      if (seller != null) {
+                                                        Utils.dialPhoneNumber(
+                                                            seller!
+                                                                .phoneNumber);
+                                                      }
+                                                    },
+                                                    iconSize: 15)),
+                                            Text('   '),
+                                            CircleAvatar(
+                                                backgroundColor: Colors.blue,
+                                                radius: 18,
+                                                child: IconButton(
+                                                    icon: const Icon(
+                                                        Icons.chat_rounded,
+                                                        color: Colors.white),
+                                                    onPressed: () {
+                                                      if (seller != null) {
+                                                        Navigator.of(context)
+                                                            .pushNamed(
+                                                                '/messages',
+                                                                arguments: {
+                                                              'otherChatter':
+                                                                  seller
+                                                            });
+                                                        ;
+                                                      }
+                                                    },
+                                                    iconSize: 15)),
+                                          ],
+                                        ),
                                       )
                                     ]))))
                   ])),

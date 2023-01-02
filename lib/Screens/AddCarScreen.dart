@@ -47,20 +47,20 @@ class _AddCarScreenState extends State<AddCarScreen> {
   }
 
   void postCar() async {
-    await uploadFiles();
+    uploadFiles().then((value) => carsRef.doc().set({
+          'brand': brandController[0],
+          'model': modelController.text,
+          'year': yearController.text,
+          'description': descriptionController.text,
+          'mileage': mileageController.text,
+          'startingPrice': priceController.text,
+          'images': downloadUrls,
+          'validUntil': DateTime.now(),
+          'sellerID': "5Hq5HL1TRdS7iz4Uz7Oi7uQsb5G2",
+          'bidderID': "",
+          'currentBid': 0
+        }));
     print(downloadUrls);
-    carsRef.doc().set({
-      'brand': brandController[0],
-      'model': modelController.text,
-      'year': yearController.text,
-      'description': descriptionController.text,
-      'mileage': mileageController.text,
-      'startingPrice': priceController.text,
-      'images': downloadUrls,
-      'sellerID': "5Hq5HL1TRdS7iz4Uz7Oi7uQsb5G2",
-      'bidderID': "",
-      'currentBid': 0
-    });
   }
 
   _stepState(int step) {

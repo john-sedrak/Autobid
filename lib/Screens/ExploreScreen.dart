@@ -1,5 +1,9 @@
+import 'package:flutter/services.dart';
+import 'package:multi_select_flutter/multi_select_flutter.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:numberpicker/numberpicker.dart';
+import 'dart:convert';
 
 import '../Classes/Car.dart';
 import '../Custom/CarCard.dart';
@@ -18,6 +22,17 @@ class _ExploreScreenState extends State<ExploreScreen> {
 
   List<Car> _cars = [];
   final carsRef = FirebaseFirestore.instance.collection('Cars');
+
+  final startPriceController = TextEditingController();
+  final endPriceController = TextEditingController();
+  final mileageController = TextEditingController();
+  final yearValue = TextEditingController();
+
+  late List<String> listOfAllBrands;
+
+  List<String> listOfBrands = [];
+  List<String> listOfModels = [];
+  late Map<String, dynamic> brandModelInfo;
 
   int loaded = 0;
 
@@ -44,7 +59,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
         currentBid: double.parse(map["currentBid"].toString()),
         startingPrice: double.parse(map["startingPrice"].toString()),
         sellerDescription: map["description"].toString(),
-        validUntil: map["validUntil"].toDate());
+        validUntil: map["validUntil"]==null?DateTime.now():map["validUntil"].toDate());
   }
 
   Future<void> getCars() async{
@@ -71,10 +86,40 @@ class _ExploreScreenState extends State<ExploreScreen> {
     );
   }
 
+  Future<void> getBrandModelInfo() async{
+    final data = await rootBundle.loadString('assets/brandModelInfo.json');
+
+    brandModelInfo = await json.decode(data);
+
+    
+
+    setState(() {
+      listOfAllBrands = brandModelInfo.keys.toList();
+      listOfAllBrands.sort();
+      listOfBrands = listOfAllBrands;
+    });
+
+  }
+
+  void updateModelList(List<String> brands) {
+
+    List<dynamic> modelList = [];
+
+    brands.forEach((brand) { 
+      modelList = brandModelInfo[brand];
+
+      modelList.forEach((element) {listOfModels.add(element['Name']);});
+    });
+
+
+  }
+
   @override
   void initState() {
+    
     getCars();
     super.initState();
+    getBrandModelInfo();
     setState(() {
       _initialized = true;
     });
@@ -92,27 +137,104 @@ class _ExploreScreenState extends State<ExploreScreen> {
             child: RefreshIndicator(
             color: Colors.pink,
             onRefresh: () => getCars(),
-            child: ListView.builder(
-                itemCount: _cars.length,
-                itemBuilder: (context, index) => Column(
+            child: SizedBox( height: 550,
+              child: Stack(
+                children: [
+                  Column(
                     children: [
-                      CarCard(
-                        car: _cars[index],
-
+                      Container(height: 100),
+                      Expanded(
+                        child: ListView.builder(
+                            itemCount: _cars.length,
+                            itemBuilder: (context, index) => Column(
+                                children: [
+                                  CarCard(
+                                    car: _cars[index],
+                      
+                                  ),
+                                  // if (loaded != favoriteDocs.length &&
+                                  //     index == favorites.length - 1)
+                                  //   isLoading
+                                  //       ? Center(
+                                  //           child: CircularProgressIndicator(
+                                  //           color: Colors.pink,
+                                  //         ))
+                                  //       : ElevatedButton(
+                                  //           onPressed: () => loadMore(),
+                                  //           child: Text("Load More"))
+                                ],
+                              )
+                            ),
                       ),
-                      // if (loaded != favoriteDocs.length &&
-                      //     index == favorites.length - 1)
-                      //   isLoading
-                      //       ? Center(
-                      //           child: CircularProgressIndicator(
-                      //           color: Colors.pink,
-                      //         ))
-                      //       : ElevatedButton(
-                      //           onPressed: () => loadMore(),
-                      //           child: Text("Load More"))
                     ],
-                  )
-                ),
+                  ),
+                  Container( width:500, 
+                    child: 
+                        ExpansionTile(
+                          backgroundColor: Colors.white,
+                          collapsedBackgroundColor: Colors.white,
+                          maintainState: true,
+                          title: const Text('Filter...'),
+                          children: [
+                            Row(crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Text("Price Range: ", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),),
+                                Container(width:100,child: TextField(controller: startPriceController, decoration: InputDecoration(labelText: "From"), keyboardType: TextInputType.number, textAlign: TextAlign.center,)),
+                                Text(" to "),
+                                Container(width:100,child: TextField(controller: endPriceController, decoration: InputDecoration(labelText: "To"), keyboardType: TextInputType.number, textAlign: TextAlign.center,)),
+                            ],),
+                            Container(width:430,
+                              child: Row(
+                                children: [
+                                  Container( width: 140,
+                                    
+                                      child: MultiSelectDialogField(
+                                        separateSelectedItems: true,
+                                        items: listOfBrands.map((e) => MultiSelectItem(e, e)).toList(),
+                                        onConfirm: (list){
+                                          setState(() {
+                                            updateModelList(list);
+                                          });
+                                        },
+                                        buttonIcon: Icon(Icons.arrow_downward, color: Colors.pink,),
+                                        searchable: true,
+                                        title: const Text('Brand'),
+                                        searchHint: 'Brand...',
+                                        buttonText: const Text('Brand'),
+                                      ),
+                                    
+                                  ),
+                                  Container(width: 140,
+                                    
+                                      child: MultiSelectDialogField(
+                                        separateSelectedItems: true,
+                                        items: listOfModels.map((e) => MultiSelectItem(e, e)).toList(),
+                                        onConfirm: (list){
+                                                      
+                                        },
+                                        searchable: true,
+                                        title: const Text('Model'),
+                                        searchHint: 'Model...',
+                                        buttonText: const Text('Model'),
+                                      ),
+                                    
+                                  ),
+                                  Container(width: 130,
+                                    
+                                      child: TextField(controller: yearValue, keyboardType: TextInputType.number, decoration: InputDecoration(labelText:"Year"),)
+                                    
+                                  ),
+                                ],
+                              ),
+                            ),
+                            
+                          ]
+                        
+                      )
+                  ),
+                ],
+              ),
+            ),
             )
           );
   }
@@ -121,19 +243,3 @@ class _ExploreScreenState extends State<ExploreScreen> {
 
 
 }
-    // return Container(
-    //   child: CarCard(car: Car(id:'cid1', mileage: 2000, bidderID: '', sellerID: '', brand: 'Mercedes', model: 'A-Class',
-    //   year: 2022, currentBid: 0, startingPrice: 1000000, sellerDescription: 'Best Car', validUntil: DateTime.utc(2022,12,31),
-    //   carImagePaths: ['https://assets.bonappetit.com/photos/57af6bea53e63daf11a4e565/16:9/w_1280,c_limit/fattoush.jpg',
-    //   'https://assets.bonappetit.com/photos/57af6bea53e63daf11a4e565/16:9/w_1280,c_limit/fattoush.jpg',
-    //   'https://image.shutterstock.com/image-photo/plate-delicious-chicken-alfredo-on-600w-613083071.jpg',
-    //   'https://assets.bonappetit.com/photos/57af6bea53e63daf11a4e565/16:9/w_1280,c_limit/fattoush.jpg',
-    //   'https://assets.bonappetit.com/photos/57af6bea53e63daf11a4e565/16:9/w_1280,c_limit/fattoush.jpg',
-    //   'https://image.shutterstock.com/image-photo/plate-delicious-chicken-alfredo-on-600w-613083071.jpg',
-    //   'https://assets.bonappetit.com/photos/57af6bea53e63daf11a4e565/16:9/w_1280,c_limit/fattoush.jpg',
-    //   'https://assets.bonappetit.com/photos/57af6bea53e63daf11a4e565/16:9/w_1280,c_limit/fattoush.jpg',
-    //   'https://image.shutterstock.com/image-photo/plate-delicious-chicken-alfredo-on-600w-613083071.jpg',
-    //   'https://assets.bonappetit.com/photos/57af6bea53e63daf11a4e565/16:9/w_1280,c_limit/fattoush.jpg',
-    //   'https://assets.bonappetit.com/photos/57af6bea53e63daf11a4e565/16:9/w_1280,c_limit/fattoush.jpg',
-    //   'https://image.shutterstock.com/image-photo/plate-delicious-chicken-alfredo-on-600w-613083071.jpg']
-    //   ))

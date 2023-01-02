@@ -1,5 +1,6 @@
 import 'package:url_launcher/url_launcher.dart';
 
+
 class Utils{
 
   static Future<void> dialPhoneNumber(String phoneNumber) async{
@@ -10,5 +11,8 @@ class Utils{
       throw 'Could not launch $call';
     }
   }
+
+  
+  
 
 }

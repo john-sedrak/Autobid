@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:autobid/Classes/Car.dart';
 import 'package:autobid/Custom/FavoriteCard.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -12,7 +13,9 @@ class FavoritesScreen extends StatefulWidget {
 }
 
 class _FavoritesScreenState extends State<FavoritesScreen> {
-  String userId = "RoFvf4QhbYY3dybd0nDulXzxLcK2";
+  //String userId = "RoFvf4QhbYY3dybd0nDulXzxLcK2";
+  String userId = FirebaseAuth.instance.currentUser!.uid;
+
   final carsRef = FirebaseFirestore.instance.collection('Cars');
 
   List<Car> favorites = [];

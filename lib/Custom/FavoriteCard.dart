@@ -13,9 +13,9 @@ class FavoriteCard extends StatefulWidget {
 }
 
 class _FavoriteCardState extends State<FavoriteCard> {
-  void goToBiddingScreen(BuildContext context) {
-    Navigator.of(context)
-        .pushNamed('/bidRoute', arguments: {'car': widget.car});
+  void goToBiddingScreen(BuildContext context, {bool isExpanded = false}) {
+    Navigator.of(context).pushNamed('/bidRoute',
+        arguments: {'car': widget.car, 'isExpanded': isExpanded});
   }
 
   String addCommas(String s) {
@@ -44,9 +44,11 @@ class _FavoriteCardState extends State<FavoriteCard> {
                         topLeft: Radius.circular(15),
                         bottomLeft: Radius.circular(15)),
                     child: Image.network(
-                      widget.car.carImagePaths[0],
+                      widget.car.carImagePaths.isEmpty
+                          ? "https://craftsnippets.com/articles_images/placeholder/placeholder.jpg"
+                          : widget.car.carImagePaths[0],
                       height: 180,
-                      fit: BoxFit.contain,
+                      fit: BoxFit.cover,
                     ),
                   ),
                 ),
@@ -113,7 +115,8 @@ class _FavoriteCardState extends State<FavoriteCard> {
                                   flex: 8,
                                   child: OutlinedButton(
                                     onPressed: () {
-                                      goToBiddingScreen(context);
+                                      goToBiddingScreen(context,
+                                          isExpanded: true);
                                     },
                                     style: ButtonStyle(
                                       foregroundColor:
@@ -135,27 +138,6 @@ class _FavoriteCardState extends State<FavoriteCard> {
                                     ),
                                   ),
                                 ),
-                                // const Expanded(
-                                //   flex: 1,
-                                //   child: Text(" "),
-                                // ),
-                                // Expanded(
-                                //   flex: 3,
-                                //   child: IconButton(
-                                //       icon: const Icon(
-                                //         Icons.delete_outline,
-                                //         color: Colors.pink,
-                                //       ),
-                                //       onPressed: () {
-                                //         print('pls remove');
-                                //       },
-                                //       style: ButtonStyle(
-                                //         side: MaterialStateProperty.all(
-                                //             BorderSide(color: Colors.pink)),
-                                //         overlayColor: MaterialStateProperty.all(
-                                //             Colors.orange.shade200),
-                                //       )),
-                                // ),
                               ],
                             ),
                           )

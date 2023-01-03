@@ -9,8 +9,6 @@ import '../Classes/Car.dart';
 import '../Custom/CarCard.dart';
 
 class ExploreScreen extends StatefulWidget {
-
-
   const ExploreScreen({super.key});
 
   @override
@@ -18,8 +16,6 @@ class ExploreScreen extends StatefulWidget {
 }
 
 class _ExploreScreenState extends State<ExploreScreen> {
-  
-
   List<Car> _cars = [];
   final carsRef = FirebaseFirestore.instance.collection('Cars');
 
@@ -62,7 +58,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
         validUntil: map["validUntil"]==null?DateTime.now():map["validUntil"].toDate());
   }
 
-  Future<void> getCars() async{
+  Future<void> getCars() async {
     loaded = 0;
     setState(() {
       isLoading = true;
@@ -71,19 +67,15 @@ class _ExploreScreenState extends State<ExploreScreen> {
 
     var stream = carsRef.snapshots();
 
-    stream.listen(
-      (snapshot) {
-        snapshot.docs.forEach(
-          (carDoc) { 
-            setState(() {
-              Map<String, dynamic> carMap = carDoc.data() as Map<String, dynamic>;
-              _cars.add(mapToCar(carDoc.id, carMap));
-              loaded++;
-            });
-          }
-        );
-      }
-    );
+    stream.listen((snapshot) {
+      snapshot.docs.forEach((carDoc) {
+        setState(() {
+          Map<String, dynamic> carMap = carDoc.data() as Map<String, dynamic>;
+          _cars.add(mapToCar(carDoc.id, carMap));
+          loaded++;
+        });
+      });
+    });
   }
 
   Future<void> getBrandModelInfo() async{

@@ -1,4 +1,8 @@
+import 'package:autobid/Classes/Car.dart';
+import 'package:autobid/Classes/User.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:url_launcher/url_launcher.dart';
+
 
 
 class Utils{
@@ -12,7 +16,58 @@ class Utils{
     }
   }
 
-  
-  
 
+  static Car mapToCar(String id, Map<String, dynamic> map) {
+    List<String> images = [];
+    for (var img in map["images"]) {
+      images.add(img.toString());
+    }
+
+    return Car(
+        id: id,
+        carImagePaths: images,
+        mileage: double.parse(map["mileage"].toString()),
+        bidderID: map["bidderID"].toString(),
+        sellerID: map["sellerID"].toString(),
+        brand: map["brand"].toString(),
+        model: map["model"].toString(),
+        year: int.parse(map["year"].toString()),
+        currentBid: double.parse(map["currentBid"].toString()),
+        startingPrice: double.parse(map["startingPrice"].toString()),
+        sellerDescription: map["description"].toString(),
+        validUntil: map["validUntil"].toDate());
+  }
+
+  static User mapToUser(String id, Map<String, dynamic> map) {
+    List<String> favorites = [];
+    for (var img in map["favorites"]) {
+      favorites.add(img.toString());
+    }
+
+    User u = User(
+        id: id,
+        favorites: favorites,
+        name: map["name"].toString(),
+        email: map["email"].toString(),
+        phoneNumber: map["phone"].toString());
+    return u;
+  }
+
+  static Future<void> addOrRemoveFromFavorites(User u, String carId) {
+    List<String> favIds = u.favorites;
+
+    int index = favIds.indexOf(carId);
+    if (index == -1) {
+      //add to fav
+      favIds.add(carId);
+    } else {
+      //remove from fav
+      favIds.removeAt(index);
+    }
+    return FirebaseFirestore.instance
+        .collection('Users')
+        .doc(u.id)
+        .update({"favorites": favIds});
+  }
 }
+

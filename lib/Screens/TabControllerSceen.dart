@@ -45,24 +45,27 @@ class _TabControllerScreenState extends State<TabControllerScreen> {
   @override
   void initState() {
     // TODO: implement initState
-      FirebaseMessaging.onMessageOpenedApp.listen((message) {
-        print('opened notification');
-        
-        FirebaseFirestore.instance.doc(message.data['senderRef']).get().then((otherChatter){
-          if(Navigator.canPop(context)){
-            Navigator.of(context).pushReplacementNamed(message.data['screen'],
-              arguments: {'otherChatter': otherChatter});
-          }
-          else{
-            Navigator.of(context).pushNamed(message.data['screen'],
-              arguments: {'otherChatter': otherChatter});
+    FirebaseMessaging.onMessageOpenedApp.listen((message) {
+      print('opened notification');
 
+      if (message.data['screen'] == '/messages') {
+        FirebaseFirestore.instance
+            .doc(message.data['senderRef'])
+            .get()
+            .then((otherChatter) {
+          if (Navigator.canPop(context)) {
+            Navigator.of(context).pushReplacementNamed(message.data['screen'],
+                arguments: {'otherChatter': otherChatter});
+          } else {
+            Navigator.of(context).pushNamed(message.data['screen'],
+                arguments: {'otherChatter': otherChatter});
           }
         });
-
-      });
+      }
+    });
     super.initState();
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

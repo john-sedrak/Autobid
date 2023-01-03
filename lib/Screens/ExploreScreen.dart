@@ -1,3 +1,6 @@
+import 'dart:math';
+
+import 'package:autobid/Lists/governorates.dart';
 import 'package:flutter/services.dart';
 import 'package:multi_select_flutter/multi_select_flutter.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -7,6 +10,7 @@ import 'dart:convert';
 
 import '../Classes/Car.dart';
 import '../Custom/CarCard.dart';
+import '../Utils/utils.dart';
 
 class ExploreScreen extends StatefulWidget {
   const ExploreScreen({super.key});
@@ -37,27 +41,6 @@ class _ExploreScreenState extends State<ExploreScreen> {
   bool _initialized = false;
   bool _error = false;
 
-  Car mapToCar(String id, Map<String, dynamic> map) {
-    List<String> images = [];
-    for (var img in map["images"]) {
-      images.add(img.toString());
-    }
-
-    return Car(
-        id: id,
-        carImagePaths: images,
-        mileage: double.parse(map["mileage"].toString()),
-        bidderID: map["bidderID"].toString(),
-        sellerID: map["sellerID"].toString(),
-        brand: map["brand"].toString(),
-        model: map["model"].toString(),
-        year: int.parse(map["year"].toString()),
-        currentBid: double.parse(map["currentBid"].toString()),
-        startingPrice: double.parse(map["startingPrice"].toString()),
-        sellerDescription: map["description"].toString(),
-        validUntil: map["validUntil"]==null?DateTime.now():map["validUntil"].toDate());
-  }
-
   Future<void> getCars() async {
     loaded = 0;
     setState(() {
@@ -73,7 +56,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
           (carDoc) { 
             setState(() {
               Map<String, dynamic> carMap = carDoc.data() as Map<String, dynamic>;
-              _cars.add(mapToCar(carDoc.id, carMap));
+              _cars.add(Utils.mapToCar(carDoc.id, carMap));
               loaded++;
               if(loaded > 5){
                 return;
@@ -100,7 +83,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
 
   }
 
-  void updateModelList(List<String> brands) {
+  void updateModelList(List<dynamic> brands) {
 
     List<dynamic> modelList = [];
 
@@ -136,12 +119,11 @@ class _ExploreScreenState extends State<ExploreScreen> {
             child: RefreshIndicator(
             color: Colors.pink,
             onRefresh: () => getCars(),
-            child: SizedBox( height: 550,
               child: Stack(
                 children: [
                   Column(
                     children: [
-                      Container(height: 100),
+                      Container(height: 55),
                       Expanded(
                         child: ListView.builder(
                             itemCount: _cars.length,
@@ -167,75 +149,198 @@ class _ExploreScreenState extends State<ExploreScreen> {
                       ),
                     ],
                   ),
-                  Container( width:500, 
+                  Container( width:500,decoration: BoxDecoration(
+                      boxShadow: [
+                        BoxShadow(blurRadius: 5.0, spreadRadius: 3, color: Colors.grey.shade400)
+                      ],
+                      borderRadius: BorderRadius.circular(20),
+                      color: Colors.grey.shade200,
+                    ),
                     child: 
-                        ExpansionTile(
-                          tilePadding: EdgeInsets.all(5),
-                          childrenPadding: EdgeInsets.all(5),
-                          backgroundColor: Colors.white,
-                          collapsedBackgroundColor: Colors.white,
-                          maintainState: true,
-                          title: const Text('Filter...'),
-                          children: [
-                            Row(crossAxisAlignment: CrossAxisAlignment.center, mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text("Price Range: ", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),),
-                                Container(width:100,child: TextField(controller: startPriceController, decoration: InputDecoration(labelText: "From"), keyboardType: TextInputType.number, textAlign: TextAlign.center,)),
-                                Text(" to "),
-                                Container(width:100,child: TextField(controller: endPriceController, decoration: InputDecoration(labelText: "To"), keyboardType: TextInputType.number, textAlign: TextAlign.center,)),
-                            ],),
-                            Container(width:430,
-                              child: Row(
+                        ClipRRect( borderRadius: BorderRadius.all(Radius.circular(20)),
+                          child: ExpansionTile(
+                            iconColor: Colors.grey,
+                            collapsedIconColor: Colors.grey,
+                            // tilePadding: EdgeInsets.all(5),
+                            childrenPadding: EdgeInsets.all(5),
+                            backgroundColor: Colors.white,
+                            collapsedBackgroundColor: Colors.white,
+                            maintainState: true,
+                            title: const Text('Filter...'),
+                            children: [
+                              Container(height:50,
+                                child: Row(children: [
+                                  Expanded(child: Divider(color: Colors.grey)),
+                                  Text(" What are you looking for? ", style: TextStyle(color: Colors.grey)),
+                                  Expanded(child: Divider(color: Colors.grey)),
+                                ],),
+                              ),
+                              Container(width:430,
+                                child: Row(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Container( width: 140,
+                                      
+                                        
+                                        child: MultiSelectDialogField(
+                                          decoration: BoxDecoration(
+                                            border: Border.all(),
+                                            borderRadius: BorderRadius.circular(10)
+                                          ),
+                                          separateSelectedItems: true,
+                                          items: listOfBrands.map((e) => MultiSelectItem(e, e)).toList(),
+                                          onConfirm: (list){
+                                            setState(() {
+                                              updateModelList(list);
+                                            });
+                                          },
+                                          chipDisplay: MultiSelectChipDisplay(scroll: true, textStyle: TextStyle(color: Colors.white), chipColor: Colors.pinkAccent,),
+                                          searchable: true,
+                                          title: const Text('Brand'),
+                                          searchHint: 'Brand...',
+                                          buttonText: const Text('Brand'),
+                                        ),
+                                      
+                                    ),
+                                    Container(width: 140,
+                                      
+                                        child: MultiSelectDialogField(
+                                          decoration: BoxDecoration(
+                                            border: Border.all(),
+                                            borderRadius: BorderRadius.circular(10)
+                                          ),
+                                          separateSelectedItems: true,
+                                          items: listOfModels.map((e) => MultiSelectItem(e, e)).toList(),
+                                          onConfirm: (list){
+                                                        
+                                          },
+                                          chipDisplay: MultiSelectChipDisplay(scroll: true, textStyle: TextStyle(color: Colors.white), chipColor: Colors.pinkAccent,),
+                                          searchable: true,
+                                          title: const Text('Model'),
+                                          searchHint: 'Model...',
+                                          buttonText: const Text('Model'),
+                                        ),
+
+                                    ),
+                                  SizedBox(width:100,
+                                    child: TextField(
+                                      controller: yearValue,
+                                      decoration: InputDecoration(
+                                        labelText: 'Year',
+                                        contentPadding: EdgeInsets.all(5),
+                                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10))
+                                      ), 
+                                      keyboardType: TextInputType.number, textAlign: TextAlign.center,
+                                    )
+                                  ),
+                                  ],
+                                ),
+                              ),
+                              Container(height:50,
+                                child: Row(children: [
+                                  Expanded(child: Divider(color: Colors.grey)),
+                                  Text(" Price Range ", style: TextStyle(color: Colors.grey)),
+                                  Expanded(child: Divider(color: Colors.grey)),
+                                ],),
+                              ),
+                              Container( width: 300,
+                                child: Row(crossAxisAlignment: CrossAxisAlignment.center, mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    SizedBox(width:80,
+                                      child: TextField(
+                                        controller: startPriceController,
+                                        decoration: InputDecoration(
+                                          contentPadding: EdgeInsets.all(5),
+                                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10))
+                                        ), 
+                                        keyboardType: TextInputType.number, textAlign: TextAlign.center,
+                                      )
+                                    ),
+                                    Icon(Icons.arrow_forward),
+                                    SizedBox(width:80,
+                                      child: TextField(
+                                        controller: endPriceController,
+                                        decoration: InputDecoration(
+                                          contentPadding: EdgeInsets.all(5),
+                                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10))
+                                        ), 
+                                        keyboardType: TextInputType.number, textAlign: TextAlign.center,
+                                      )
+                                    ),
+                                    Text(" EGP")
+                                  ]
+                                ),
+                              ),
+                              Row( mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Container( width: 140,
-                                    
-                                      child: MultiSelectDialogField(
-                                        separateSelectedItems: true,
-                                        items: listOfBrands.map((e) => MultiSelectItem(e, e)).toList(),
-                                        onConfirm: (list){
-                                          setState(() {
-                                            updateModelList(list);
-                                          });
-                                        },
-                                        buttonIcon: Icon(Icons.arrow_downward, color: Colors.pink,),
-                                        searchable: true,
-                                        title: const Text('Brand'),
-                                        searchHint: 'Brand...',
-                                        buttonText: const Text('Brand'),
-                                      ),
-                                    
+                                  Container(height:50,width: 200,
+                                    child: Row(children: [
+                                      Expanded(child: Divider(color: Colors.grey)),
+                                      Text(" Mileage below ", style: TextStyle(color: Colors.grey)),
+                                      Expanded(child: Divider(color: Colors.grey)),
+                                    ],),
                                   ),
-                                  Container(width: 140,
-                                    
-                                      child: MultiSelectDialogField(
-                                        separateSelectedItems: true,
-                                        items: listOfModels.map((e) => MultiSelectItem(e, e)).toList(),
-                                        onConfirm: (list){
-                                                      
-                                        },
-                                        searchable: true,
-                                        title: const Text('Model'),
-                                        searchHint: 'Model...',
-                                        buttonText: const Text('Model'),
-                                      ),
-                                    
-                                  ),
-                                  Container(width: 100,
-                                    
-                                      child: TextField(controller: yearValue, keyboardType: TextInputType.number, decoration: InputDecoration(labelText:"Year"),)
-                                    
+                                  
+                                  Container(height:50,width: 200,
+                                    child: Row(children: [
+                                      Expanded(child: Divider(color: Colors.grey)),
+                                      Text(" Location ", style: TextStyle(color: Colors.grey)),
+                                      Expanded(child: Divider(color: Colors.grey)),
+                                    ],),
                                   ),
                                 ],
                               ),
-                            ),
-                            
-                          ]
-                        
-                      )
+                              Row( mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Container(width: 170,
+                                    child: Row(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.center,
+                                      children: [
+                                        SizedBox(width:80,
+                                          child: TextField(
+                                            controller: endPriceController,
+                                            decoration: InputDecoration(
+                                              contentPadding: EdgeInsets.all(5),
+                                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(10))
+                                            ), 
+                                            keyboardType: TextInputType.number, textAlign: TextAlign.center,
+                                          )
+                                        ),
+                                        Text(' '),
+                                        Text(' '),
+                                        Text(" km")
+                                      ],
+                                    ),
+                                  ),
+                                  Container(height: 110,child: Expanded(child: VerticalDivider(color: Colors.grey, thickness: 1))),
+                                  Container(width: 170,
+                                      child: Center(
+                                        
+                                          child: MultiSelectDialogField(
+                                            decoration: BoxDecoration(
+                                              border: Border.all(color: Colors.grey),
+                                              borderRadius: BorderRadius.circular(10)
+                                            ),
+                                            separateSelectedItems: true,
+                                            items: governorates.map((e) => MultiSelectItem(e, e)).toList(),
+                                            onConfirm: (list){
+                                                          
+                                            },
+                                            chipDisplay: MultiSelectChipDisplay(scroll: true, textStyle: TextStyle(color: Colors.white), chipColor: Colors.pinkAccent,),
+                                            searchable: true,
+                                            title: const Text('Location'),
+                                            searchHint: 'Location...',
+                                            buttonText: const Text('Location'),
+                                          ),
+                                        
+                                      ),
+                                    ),
+                                ],
+                              ),
+                            ]
+                          ),
+                        )
                   ),
                 ],
               ),
-            ),
             )
           );
   }

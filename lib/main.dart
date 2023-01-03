@@ -1,3 +1,4 @@
+import 'package:autobid/Screens/MessagesScreen.dart';
 import 'package:autobid/Screens/BiddingScreen.dart';
 import 'package:autobid/Screens/AddCarScreen.dart';
 import 'package:flutter/material.dart';
@@ -51,25 +52,26 @@ class _MyAppState extends State<MyApp> {
             brightness: Brightness.light,
             primary: Colors.white,
             onPrimary: Colors.black,
-            secondary: Colors.pink.shade300,
+            secondary: Colors.pink,
             onSecondary: Colors.white,
             error: Colors.white,
-            onError: Colors.pink.shade300,
+            onError: Colors.pink,
             background: Colors.grey.shade300,
             onBackground: Colors.black,
             surface: Colors.white,
             onSurface: Colors.black,
-          ),
-          appBarTheme:
-              AppBarTheme(elevation: 0, backgroundColor: Colors.grey.shade300),
-          scaffoldBackgroundColor: Colors.grey.shade300,
-          //useMaterial3: true
-        ),
-        initialRoute: '/',
-        routes: {
-          '/': (context) => const TabControllerScreen(),
-          '/bidRoute': (context) => const BiddingScreen(),
-          '/addCar': (context) => const AddCarScreen()
-        });
+            ),
+        appBarTheme: AppBarTheme(elevation: 0, backgroundColor: Colors.grey.shade300),
+        scaffoldBackgroundColor: Colors.grey.shade300,
+        //useMaterial3: true
+      ),
+      initialRoute: '/',
+      routes:{
+        '/': (context) => const TabControllerScreen(),
+        '/bidRoute': (context) => const BiddingScreen(),
+        '/addCar': (context) => const AddCarScreen(),
+        '/messages': (context) => MessagesScreen(),
+      }
+    );
   }
 }

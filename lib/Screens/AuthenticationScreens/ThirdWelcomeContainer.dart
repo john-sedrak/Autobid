@@ -42,7 +42,7 @@ class ThirdWelcomeContainer extends StatelessWidget {
                         Container(
                           margin: EdgeInsets.all(5),
                           child: Text(
-                            "Purchase",
+                            "Sell",
                             style: TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold,
@@ -51,12 +51,12 @@ class ThirdWelcomeContainer extends StatelessWidget {
                         ),
                         Text(
                           textAlign: TextAlign.center,
-                          "We help you find your dream car ",
+                          "We help you sell your car ",
                           style: TextStyle(color: Colors.white, fontSize: 18),
                         ),
                         Text(
                           textAlign: TextAlign.center,
-                          "with a fraction of the price !",
+                          "and make cash of it !",
                           style: TextStyle(color: Colors.white, fontSize: 18),
                         )
                       ]),
@@ -68,8 +68,15 @@ class ThirdWelcomeContainer extends StatelessWidget {
                   width: 100,
                   height: 40,
                   child: ElevatedButton(
-                    onPressed: () {},
-                    child: Text("Start", style: TextStyle(letterSpacing: 1.5, fontWeight: FontWeight.bold, fontSize: 16),),
+                    onPressed: () =>
+                        Navigator.of(context).pushReplacementNamed('/login'),
+                    child: Text(
+                      "Start",
+                      style: TextStyle(
+                          letterSpacing: 1.5,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16),
+                    ),
                     style: ElevatedButton.styleFrom(
                       shape: RoundedRectangleBorder(
                           //to set border radius to button

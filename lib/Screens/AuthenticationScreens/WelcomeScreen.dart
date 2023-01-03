@@ -1,6 +1,7 @@
 import 'package:autobid/Screens/AuthenticationScreens/FirstWelcomeContainer.dart';
 import 'package:autobid/Screens/AuthenticationScreens/SecondWelcomeCoontainer.dart';
 import 'package:autobid/Screens/AuthenticationScreens/ThirdWelcomeContainer.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/src/widgets/container.dart';
@@ -16,11 +17,25 @@ class WelcomeScreen extends StatefulWidget {
 
 class _WelcomeScreenState extends State<WelcomeScreen> {
   final controller = PageController();
+  final FirebaseAuth auth = FirebaseAuth.instance;
 
   @override
   void dispose() {
     controller.dispose();
     super.dispose();
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    if (auth.currentUser != null) {
+      Navigator.of(context).pushReplacementNamed('/home');
+    }
+  }
+
+  void navigateToSignup() {
+    Navigator.of(context).pushReplacementNamed('/login');
   }
 
   @override
@@ -51,13 +66,14 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
           children: [
             Container(
               margin: EdgeInsets.all(10),
-              child: RichText(
-                  text: TextSpan(
-                      text: "Skip to Sign Up",
-                      style: TextStyle(
-                          decoration: TextDecoration.underline,
-                          fontSize: 12,
-                          color: Colors.grey.shade300))),
+              child: InkWell(
+                onTap: navigateToSignup,
+                child: Text("Skip to Sign Up",
+                    style: TextStyle(
+                        decoration: TextDecoration.underline,
+                        fontSize: 10,
+                        color: Colors.grey.shade300)),
+              ),
             ),
             Center(
                 child: SmoothPageIndicator(

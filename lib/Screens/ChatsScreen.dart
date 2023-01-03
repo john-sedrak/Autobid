@@ -1,7 +1,7 @@
 import 'package:autobid/Custom/ChatTile.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 class ChatsScreen extends StatefulWidget {
   const ChatsScreen({super.key});
@@ -30,14 +30,19 @@ class _ChatsScreenState extends State<ChatsScreen> {
                 if (snapshot.hasData) {
                   var chats = snapshot.data!.docs;
 
-                  return ListView.builder(
-                    itemBuilder: (context, index) {
-                      var chat = chats[index];
-                      // print(chat.reference.collection("Texts").snapshots());
-                      return ChatTile(chatSnapshot: chat);
-                    },
-                    itemCount: chats.length,
-                  );
+                  if (chats.isNotEmpty) {
+                    return ListView.builder(
+                      itemBuilder: (context, index) {
+                        var chat = chats[index];
+                        return ChatTile(chatSnapshot: chat);
+                      },
+                      itemCount: chats.length,
+                    );
+                  } else {
+                    return const Center(
+                      child: Text("You have no chats."),
+                    );
+                  }
                 } else {
                   return Center(
                       child: CircularProgressIndicator(

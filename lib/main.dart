@@ -1,4 +1,5 @@
 import 'package:autobid/Screens/MessagesScreen.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'Screens/TabControllerSceen.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -18,7 +19,7 @@ class _MyAppState extends State<MyApp> {
   bool _initialized = false;
   bool _error = false;
 
-  void initializeFlutterFire() async {
+  Future<void> initializeFlutterFire() async {
     try {
       // Wait for Firebase to initialize and set `_initialized` state to true
       await Firebase.initializeApp();
@@ -37,7 +38,11 @@ class _MyAppState extends State<MyApp> {
 
   @override
   void initState() {
-    initializeFlutterFire();
+    initializeFlutterFire().then((_) {
+      FirebaseMessaging.onMessage.listen((message) {
+        print(message.data.toString());
+      });
+    });
     super.initState();
   }
 
@@ -58,16 +63,16 @@ class _MyAppState extends State<MyApp> {
             onBackground: Colors.black,
             surface: Colors.white,
             onSurface: Colors.black,
-            ),
-        appBarTheme: AppBarTheme(elevation: 0, backgroundColor: Colors.grey.shade300),
-        scaffoldBackgroundColor: Colors.grey.shade300,
-        //useMaterial3: true
-      ),
-      initialRoute: '/',
-      routes:{
-        '/': (context) => const TabControllerScreen(),
-        '/messages': (context) => MessagesScreen()
-      }
-    );
+          ),
+          appBarTheme:
+              AppBarTheme(elevation: 0, backgroundColor: Colors.grey.shade300),
+          scaffoldBackgroundColor: Colors.grey.shade300,
+          //useMaterial3: true
+        ),
+        initialRoute: '/',
+        routes: {
+          '/': (context) => const TabControllerScreen(),
+          '/messages': (context) => MessagesScreen()
+        });
   }
 }

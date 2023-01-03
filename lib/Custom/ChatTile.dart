@@ -17,7 +17,7 @@ class _ChatTileState extends State<ChatTile> {
   DocumentReference<Map<String, dynamic>> userRef =
       FirebaseFirestore.instance.doc('Users/' + 'RoFvf4QhbYY3dybd0nDulXzxLcK2');
   late DocumentSnapshot<Map<String, dynamic>> otherChatter;
-  late DocumentSnapshot<Map<String, dynamic>> latestText;
+  late Map<String, dynamic> latestText;
 
   void getChatterName() async {
     var chat = widget.chatSnapshot.data();
@@ -52,6 +52,7 @@ class _ChatTileState extends State<ChatTile> {
     getChatterName();
     widget.chatSnapshot.reference.collection('Texts').snapshots().listen(
       (event) {
+        if(mounted){
         widget.chatSnapshot.reference
             .collection('Texts')
             .orderBy('timestamp', descending: true)
@@ -60,11 +61,16 @@ class _ChatTileState extends State<ChatTile> {
             .then(
           (value) {
             setState(() {
-              latestText = value.docs[0];
-              _latestTextFetched = true;
+              if(value.docs.isNotEmpty){
+                latestText = value.docs.first.data();
+                _latestTextFetched = true;
+              }
+              else{
+                latestText = {};
+              }
             });
           },
-        );
+        );}
       },
     );
     super.initState();
@@ -75,39 +81,39 @@ class _ChatTileState extends State<ChatTile> {
     DateTime currentTime = DateTime.now();
     String time = "";
     if(_latestTextFetched && !_error){
-      var timestamp = latestText.data()!['timestamp'];
+      var timestamp = latestText['timestamp'];
       time = TimeManager.isToday(timestamp)?TimeManager.messageTime(timestamp):TimeManager.messageDate(timestamp);
     }
 
     return _chatterFetched && !_error
         ? InkWell(
             onTap: navigateToChat,
-            child: ListTile(
-              title: Text(
-                otherChatter.data()!['name'],
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+              child: ListTile(
+                title: Text(
+                  otherChatter.data()!['name'],
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                ),
+                subtitle: Container(
+                    margin: const EdgeInsets.only(top: 5),
+                    child: Text(_latestTextFetched?latestText['content']:"Tap here to start chatting!",
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(fontSize: 16),
+                    )),
+                trailing: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text(time),
+                      Container(
+                        height: 20,
+                        width: 20,
+                        decoration: BoxDecoration(
+                            // color: Theme.of(context).colorScheme.secondary,
+                            shape: BoxShape.circle),
+                      )
+                    ]),
               ),
-              subtitle: Container(
-                  margin: const EdgeInsets.only(top: 5),
-                  child: Text(_latestTextFetched?latestText.data()!['content']:"",
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(fontSize: 16),
-                  )),
-              trailing: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Text(time),
-                    Container(
-                      height: 20,
-                      width: 20,
-                      decoration: BoxDecoration(
-                          // color: Theme.of(context).colorScheme.secondary,
-                          shape: BoxShape.circle),
-                    )
-                  ]),
-            ),
           )
         : ListTile(
             title: Center(

@@ -1,5 +1,7 @@
 import 'package:autobid/Custom/CustomAppBar.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 import 'ChatsScreen.dart';
 import 'ExploreScreen.dart';
@@ -25,7 +27,7 @@ class _TabControllerScreenState extends State<TabControllerScreen> {
     'Explore',
     'Chats',
     'Listings',
-    'Favorites'
+    'Favorites',
   ];
 
   int pageIndex = 0;
@@ -36,17 +38,55 @@ class _TabControllerScreenState extends State<TabControllerScreen> {
     });
   }
 
+  void goToAddCar(BuildContext context) {
+    Navigator.of(context).pushNamed('/addCar');
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    FirebaseMessaging.onMessageOpenedApp.listen((message) {
+      print('opened notification');
+
+      if (message.data['screen'] == '/messages') {
+        FirebaseFirestore.instance
+            .doc(message.data['senderRef'])
+            .get()
+            .then((otherChatter) {
+          if (Navigator.canPop(context)) {
+            Navigator.of(context).pushReplacementNamed(message.data['screen'],
+                arguments: {'otherChatter': otherChatter});
+          } else {
+            Navigator.of(context).pushNamed(message.data['screen'],
+                arguments: {'otherChatter': otherChatter});
+          }
+        });
+      }
+    });
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(title: labels[pageIndex]),
       body: pages[pageIndex],
+      floatingActionButton: pageIndex == 0 || pageIndex == 2
+          ? FloatingActionButton(
+              onPressed: () {
+                goToAddCar(context);
+              },
+              backgroundColor: Colors.pink,
+              child: const Icon(Icons.add),
+            )
+          : Container(),
       bottomNavigationBar: BottomNavigationBar(
-        showSelectedLabels: false,
+        showSelectedLabels: true,
         showUnselectedLabels: false,
-        type: BottomNavigationBarType.fixed,
+        // type: BottomNavigationBarType.fixed,
         elevation: 10,
-        selectedItemColor: Colors.pink,
+        selectedItemColor: Theme.of(context).colorScheme.secondary,
+        unselectedItemColor: Colors.grey,
         items: [
           BottomNavigationBarItem(
               icon: Icon(Icons.home_rounded), label: labels[0]),

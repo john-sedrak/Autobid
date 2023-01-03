@@ -85,7 +85,7 @@ class _LoginScreenState extends State<LoginScreen> {
           .doc(authResult.user!.uid)
           .update({'notifToken': token});
 
-      Navigator.of(context).pushReplacementNamed('/home');
+      Navigator.of(context).pushReplacementNamed('/');
     }
   }
 
@@ -151,7 +151,7 @@ class _LoginScreenState extends State<LoginScreen> {
         'notifToken': await fbm.getToken()
       });
 
-      Navigator.of(context).pushReplacementNamed('/home');
+      Navigator.of(context).pushReplacementNamed('/');
     }
   }
 

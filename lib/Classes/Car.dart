@@ -13,6 +13,7 @@ class Car {
   final double startingPrice;
   final DateTime validUntil;
   final String sellerDescription;
+  final String location;
 
   Car(
       {required this.id,
@@ -26,5 +27,6 @@ class Car {
       required this.currentBid,
       required this.startingPrice,
       required this.sellerDescription,
-      required this.validUntil});
+      required this.validUntil,
+      required this.location});
 }

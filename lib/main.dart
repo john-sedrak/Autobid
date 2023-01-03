@@ -72,7 +72,7 @@ class _MyAppState extends State<MyApp> {
       ),
       initialRoute: '/',
       routes:{
-        '/': (context) => const TabControllerScreen(),
+        '/': (context) => !_initialized?Center(child:CircularProgressIndicator(color: Colors.pink,)):const TabControllerScreen(),
         '/bidRoute': (context) => const BiddingScreen(),
         '/addCar': (context) => const AddCarScreen(),
         '/messages': (context) => MessagesScreen(),

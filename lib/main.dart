@@ -8,7 +8,14 @@ import 'package:firebase_core/firebase_core.dart';
 
 void main(List<String> args) {
   runApp(MyApp());
+  FirebaseMessaging.onBackgroundMessage(background_notif_handler);
 }
+
+Future<void> background_notif_handler(RemoteMessage message) async {
+//await Firebase.initializeApp();
+  print("Handling a background message: ${message.data}");
+}
+
 
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
@@ -41,6 +48,8 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     initializeFlutterFire().then((_) {
+      var fbm = FirebaseMessaging.instance;
+      fbm.requestPermission();
       FirebaseMessaging.onMessage.listen((message) {
         print(message.data.toString());
       });

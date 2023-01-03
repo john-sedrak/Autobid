@@ -49,8 +49,15 @@ class _TabControllerScreenState extends State<TabControllerScreen> {
         print('opened notification');
         
         FirebaseFirestore.instance.doc(message.data['senderRef']).get().then((otherChatter){
+          if(Navigator.canPop(context)){
+            Navigator.of(context).pushReplacementNamed(message.data['screen'],
+              arguments: {'otherChatter': otherChatter});
+          }
+          else{
             Navigator.of(context).pushNamed(message.data['screen'],
               arguments: {'otherChatter': otherChatter});
+
+          }
         });
 
       });

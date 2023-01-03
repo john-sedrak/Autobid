@@ -38,6 +38,61 @@ exports.messageNotification = functions.firestore
           },
       );
     });
+
+exports.outBidNotification = functions.firestore
+    .document("Cars/{carID}")
+    .onUpdate( async (change, context) =>{
+      const bidderID = change.before.get("bidderID");
+      const newBidderID = change.after.get("bidderID");
+
+      if (bidderID === newBidderID) {
+        return;
+      }
+      const bidderSnapshot = await admin.firestore().doc("Users/"+bidderID)
+          .get();
+      const bidderToken = bidderSnapshot.get("notifToken");
+
+      const sellerID = change.after.get("sellerID");
+      const sellerSnapshot = await admin.firestore()
+          .doc("Users/"+sellerID).get();
+      const sellerToken = sellerSnapshot.get("notifToken");
+
+      const newBid = change.after.get("currentBid");
+
+      admin.messaging().sendToDevice(
+          bidderToken,
+          {
+            notification: {
+              title: `You lost your bid for the ${change.after.get("brand")} `+
+                    `${change.after.get("model")}!`,
+              body: `Reclaim this car by bidding higher than ${newBid} EGP.`,
+              clickAction: "FLUTTER_NOTIFICATION_CLICK",
+            },
+            data: {
+              click_action: "FLUTTER_NOTIFICATION_CLICK",
+              screen: "/bidRoot",
+              carId: context.params.carID,
+            },
+          },
+      );
+
+      admin.messaging().sendToDevice(
+          sellerToken,
+          {
+            notification: {
+              title: `The bid for your ${change.after.get("brand")} `+
+                    `${change.after.get("model")} has increased!`,
+              body: `The current bid is ${newBid} EGP.`,
+              clickAction: "FLUTTER_NOTIFICATION_CLICK",
+            },
+            data: {
+              click_action: "FLUTTER_NOTIFICATION_CLICK",
+              screen: "/bidRoot",
+              carId: context.params.carID,
+            },
+          },
+      );
+    });
 // // Create and deploy your first functions
 // // https://firebase.google.com/docs/functions/get-started
 //

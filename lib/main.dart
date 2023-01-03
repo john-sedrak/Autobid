@@ -1,3 +1,5 @@
+import 'package:autobid/Screens/AuthenticationScreens/LoginScreen.dart';
+import 'package:autobid/Screens/AuthenticationScreens/WelcomeScreen.dart';
 import 'package:autobid/Screens/MessagesScreen.dart';
 import 'package:autobid/Screens/BiddingScreen.dart';
 import 'package:autobid/Screens/AddCarScreen.dart';
@@ -15,7 +17,6 @@ Future<void> background_notif_handler(RemoteMessage message) async {
 //await Firebase.initializeApp();
   print("Handling a background message: ${message.data}");
 }
-
 
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
@@ -74,18 +75,20 @@ class _MyAppState extends State<MyApp> {
             onBackground: Colors.black,
             surface: Colors.white,
             onSurface: Colors.black,
-            ),
-        appBarTheme: AppBarTheme(elevation: 0, backgroundColor: Colors.grey.shade300),
-        scaffoldBackgroundColor: Colors.grey.shade300,
-        //useMaterial3: true
-      ),
-      initialRoute: '/',
-      routes:{
-        '/': (context) => !_initialized?Center(child:CircularProgressIndicator(color: Colors.pink,)):const TabControllerScreen(),
-        '/bidRoute': (context) => const BiddingScreen(),
-        '/addCar': (context) => const AddCarScreen(),
-        '/messages': (context) => MessagesScreen(),
-      }
-    );
+          ),
+          appBarTheme:
+              AppBarTheme(elevation: 0, backgroundColor: Colors.grey.shade300),
+          scaffoldBackgroundColor: Colors.grey.shade300,
+          //useMaterial3: true
+        ),
+        initialRoute: '/welcome',
+        routes: {
+          '/welcome': (context) => const WelcomeScreen(),
+          '/login': (context) => const LoginScreen(),
+          '/': (context) => const TabControllerScreen(),
+          '/bidRoute': (context) => const BiddingScreen(),
+          '/addCar': (context) => const AddCarScreen(),
+          '/messages': (context) => MessagesScreen(),
+        });
   }
 }

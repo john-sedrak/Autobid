@@ -100,6 +100,7 @@ class _TabControllerScreenState extends State<TabControllerScreen> {
         currentIndex: pageIndex,
         onTap: pageSelect,
       ),
+      resizeToAvoidBottomInset: false,
     );
   }
 }

@@ -58,9 +58,6 @@ class _ExploreScreenState extends State<ExploreScreen> {
               Map<String, dynamic> carMap = carDoc.data() as Map<String, dynamic>;
               _cars.add(Utils.mapToCar(carDoc.id, carMap));
               loaded++;
-              if(loaded > 5){
-                return;
-              }
             });
           }
         );
@@ -272,7 +269,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                               ),
                               Row( mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Container(height:50,width: 200,
+                                  Container(height:50,width: 180,
                                     child: Row(children: [
                                       Expanded(child: Divider(color: Colors.grey)),
                                       Text(" Mileage below ", style: TextStyle(color: Colors.grey)),
@@ -280,7 +277,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                                     ],),
                                   ),
                                   
-                                  Container(height:50,width: 200,
+                                  Container(height:50,width: 180,
                                     child: Row(children: [
                                       Expanded(child: Divider(color: Colors.grey)),
                                       Text(" Location ", style: TextStyle(color: Colors.grey)),

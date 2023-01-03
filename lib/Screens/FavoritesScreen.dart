@@ -2,7 +2,6 @@ import 'dart:math';
 import 'package:autobid/Classes/Car.dart';
 import 'package:autobid/Custom/FavoriteCard.dart';
 import 'package:flutter/material.dart';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class FavoritesScreen extends StatefulWidget {
@@ -18,7 +17,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
 
   List<Car> favorites = [];
 
-  List favoriteDocs = [];
+  List favoriteIds = [];
   int loaded = 0;
 
   int pageSize = 3;
@@ -51,7 +50,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
     setState(() {
       isLoading = true;
       favorites = [];
-      favoriteDocs = [];
+      favoriteIds = [];
     });
 
     final docRef = FirebaseFirestore.instance.collection('Users').doc(userId);
@@ -64,9 +63,8 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
         addAllFavoriteIds(favs);
 
         List<Car> newFavs = [];
-
-        for (int i = 0; i < min(pageSize, favoriteDocs.length); i++) {
-          var fav = favoriteDocs[i].id;
+        for (int i = 0; i < min(pageSize, favoriteIds.length); i++) {
+          var fav = favoriteIds[i];
           DocumentSnapshot carDoc = await carsRef.doc(fav).get();
           Map<String, dynamic> carMap = carDoc.data() as Map<String, dynamic>;
           Car car = mapToCar(fav, carMap);
@@ -89,7 +87,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
       newIds.add(element);
     });
 
-    favoriteDocs = newIds;
+    favoriteIds = newIds;
   }
 
   void loadMore() async {
@@ -99,9 +97,16 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
 
     List<Car> newFavs = favorites;
 
-    for (int i = loaded; i < min(loaded + pageSize, favoriteDocs.length); i++) {
-      var fav = favoriteDocs[i].id;
+    for (int i = loaded; i < min(loaded + pageSize, favoriteIds.length); i++) {
+      String fav = favoriteIds[i];
+
       DocumentSnapshot carDoc = await carsRef.doc(fav).get();
+      if (carDoc.data() == null) {
+        setState(() {
+          isLoading = false;
+        });
+        return;
+      }
       Map<String, dynamic> carMap = carDoc.data() as Map<String, dynamic>;
       Car car = mapToCar(fav, carMap);
       newFavs.add(car);
@@ -118,13 +123,12 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
       favorites.removeAt(index);
     });
 
-    String idToRemove = favoriteDocs[index].id;
-    favoriteDocs.removeAt(index);
+    String idToRemove = favoriteIds[index];
+    favoriteIds.removeAt(index);
 
     final docRef = FirebaseFirestore.instance.collection('Users').doc(userId);
 
-    docRef
-        .update({"favorites": favoriteDocs}).then((value) => print("removed"));
+    docRef.update({"favorites": favoriteIds}).then((value) => print("removed"));
     loaded--;
   }
 
@@ -151,7 +155,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                 itemBuilder: (context, index) => Column(
                       children: [
                         Dismissible(
-                          key: Key(favorites[index].id),
+                          key: Key(favorites[index].toString()),
                           direction: DismissDirection.endToStart,
                           onDismissed: (direction) =>
                               removeFromFavorites(index),
@@ -177,7 +181,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                             car: favorites[index],
                           ),
                         ),
-                        if (loaded != favoriteDocs.length &&
+                        if (loaded != favoriteIds.length &&
                             index == favorites.length - 1)
                           isLoading
                               ? Center(

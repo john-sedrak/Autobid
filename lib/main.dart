@@ -1,4 +1,6 @@
 import 'package:autobid/Screens/MessagesScreen.dart';
+import 'package:autobid/Screens/BiddingScreen.dart';
+import 'package:autobid/Screens/AddCarScreen.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'Screens/TabControllerSceen.dart';
@@ -63,16 +65,18 @@ class _MyAppState extends State<MyApp> {
             onBackground: Colors.black,
             surface: Colors.white,
             onSurface: Colors.black,
-          ),
-          appBarTheme:
-              AppBarTheme(elevation: 0, backgroundColor: Colors.grey.shade300),
-          scaffoldBackgroundColor: Colors.grey.shade300,
-          //useMaterial3: true
-        ),
-        initialRoute: '/',
-        routes: {
-          '/': (context) => const TabControllerScreen(),
-          '/messages': (context) => MessagesScreen()
-        });
+            ),
+        appBarTheme: AppBarTheme(elevation: 0, backgroundColor: Colors.grey.shade300),
+        scaffoldBackgroundColor: Colors.grey.shade300,
+        //useMaterial3: true
+      ),
+      initialRoute: '/',
+      routes:{
+        '/': (context) => const TabControllerScreen(),
+        '/bidRoute': (context) => const BiddingScreen(),
+        '/addCar': (context) => const AddCarScreen(),
+        '/messages': (context) => MessagesScreen(),
+      }
+    );
   }
 }

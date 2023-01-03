@@ -1,3 +1,4 @@
+import 'package:autobid/Providers/UserProvider.dart';
 import 'package:autobid/Screens/AuthenticationScreens/InputField.dart';
 import 'package:autobid/Screens/AuthenticationScreens/errorMessage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -8,6 +9,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
+import 'package:provider/provider.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -51,8 +53,8 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void login() async {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
     FocusManager.instance.primaryFocus?.unfocus();
-    await FirebaseAuth.instance.signOut();
     var email = emailController.text.trim();
     var password = passwordController.text;
     if (email == "" || password == "") {
@@ -78,13 +80,12 @@ class _LoginScreenState extends State<LoginScreen> {
       print(e);
     }
     var token = await fbm.getToken();
-    print(authResult == null);
     if (authResult != null) {
       FirebaseFirestore.instance
           .collection('Users')
           .doc(authResult.user!.uid)
           .update({'notifToken': token});
-
+      userProvider.fetchUser();
       Navigator.of(context).pushReplacementNamed('/');
     }
   }
@@ -101,6 +102,8 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void signup() async {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+
     FocusManager.instance.primaryFocus?.unfocus();
     var email = emailController.text.trim();
     var password = passwordController.text;
@@ -150,6 +153,7 @@ class _LoginScreenState extends State<LoginScreen> {
         'phoneNumber': phoneNumber,
         'notifToken': await fbm.getToken()
       });
+      userProvider.fetchUser();
 
       Navigator.of(context).pushReplacementNamed('/');
     }

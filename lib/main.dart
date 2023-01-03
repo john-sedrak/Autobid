@@ -1,3 +1,4 @@
+import 'package:autobid/Providers/UserProvider.dart';
 import 'package:autobid/Screens/AuthenticationScreens/LoginScreen.dart';
 import 'package:autobid/Screens/AuthenticationScreens/WelcomeScreen.dart';
 import 'package:autobid/Screens/MessagesScreen.dart';
@@ -7,6 +8,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'Screens/TabControllerSceen.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:provider/provider.dart';
 
 void main(List<String> args) {
   runApp(MyApp());
@@ -60,35 +62,38 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-        title: "AutoBid",
-        theme: ThemeData(
-          colorScheme: ColorScheme(
-            brightness: Brightness.light,
-            primary: Colors.white,
-            onPrimary: Colors.black,
-            secondary: Colors.pink,
-            onSecondary: Colors.white,
-            error: Colors.white,
-            onError: Colors.pink,
-            background: Colors.grey.shade300,
-            onBackground: Colors.black,
-            surface: Colors.white,
-            onSurface: Colors.black,
+    return ChangeNotifierProvider(
+      create: (ctx) => UserProvider(),
+      child: MaterialApp(
+          title: "AutoBid",
+          theme: ThemeData(
+            colorScheme: ColorScheme(
+              brightness: Brightness.light,
+              primary: Colors.white,
+              onPrimary: Colors.black,
+              secondary: Colors.pink,
+              onSecondary: Colors.white,
+              error: Colors.white,
+              onError: Colors.pink,
+              background: Colors.grey.shade300,
+              onBackground: Colors.black,
+              surface: Colors.white,
+              onSurface: Colors.black,
+            ),
+            appBarTheme: AppBarTheme(
+                elevation: 0, backgroundColor: Colors.grey.shade300),
+            scaffoldBackgroundColor: Colors.grey.shade300,
+            //useMaterial3: true
           ),
-          appBarTheme:
-              AppBarTheme(elevation: 0, backgroundColor: Colors.grey.shade300),
-          scaffoldBackgroundColor: Colors.grey.shade300,
-          //useMaterial3: true
-        ),
-        initialRoute: '/welcome',
-        routes: {
-          '/welcome': (context) => const WelcomeScreen(),
-          '/login': (context) => const LoginScreen(),
-          '/': (context) => const TabControllerScreen(),
-          '/bidRoute': (context) => const BiddingScreen(),
-          '/addCar': (context) => const AddCarScreen(),
-          '/messages': (context) => MessagesScreen(),
-        });
+          initialRoute: '/welcome',
+          routes: {
+            '/welcome': (context) => const WelcomeScreen(),
+            '/login': (context) => const LoginScreen(),
+            '/': (context) => const TabControllerScreen(),
+            '/bidRoute': (context) => const BiddingScreen(),
+            '/addCar': (context) => const AddCarScreen(),
+            '/messages': (context) => MessagesScreen(),
+          }),
+    );
   }
 }

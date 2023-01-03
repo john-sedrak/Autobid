@@ -1,5 +1,5 @@
 import 'package:autobid/Classes/Car.dart';
-import 'package:autobid/Classes/User.dart';
+import 'package:autobid/Classes/UserModel.dart';
 import 'package:autobid/Custom/CustomAppBar.dart';
 import 'package:autobid/Utils/utils.dart';
 import 'package:flutter/material.dart';
@@ -18,9 +18,9 @@ class _BiddingScreenState extends State<BiddingScreen> {
   late PageController _pageController;
 
   String userID = "RoFvf4QhbYY3dybd0nDulXzxLcK2";
-  User? currentUser;
+  UserModel? currentUser;
 
-  User? seller;
+  UserModel? seller;
 
   var inputController = TextEditingController();
 
@@ -51,7 +51,7 @@ class _BiddingScreenState extends State<BiddingScreen> {
     final usersRef = FirebaseFirestore.instance.collection('Users');
     DocumentSnapshot userDoc = await usersRef.doc(userID).get();
     Map<String, dynamic> userMap = userDoc.data() as Map<String, dynamic>;
-    User currentUser = Utils.mapToUser(userID, userMap);
+    UserModel currentUser = Utils.mapToUser(userID, userMap);
     // print(currentUser.favorites);
   }
 
@@ -145,7 +145,7 @@ class _BiddingScreenState extends State<BiddingScreen> {
 
     return usersRef.doc(sellerId).get().then((userDoc) {
       Map<String, dynamic> userMap = userDoc.data() as Map<String, dynamic>;
-      User sellerTmp = Utils.mapToUser(sellerId, userMap);
+      UserModel sellerTmp = Utils.mapToUser(sellerId, userMap);
       setState(() {
         seller = sellerTmp;
       });

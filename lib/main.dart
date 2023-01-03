@@ -1,5 +1,3 @@
-import 'package:autobid/Screens/AuthenticationScreens/LoginScreen.dart';
-import 'package:autobid/Screens/AuthenticationScreens/WelcomeScreen.dart';
 import 'package:flutter/material.dart';
 import 'Screens/TabControllerSceen.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -67,9 +65,7 @@ class _MyAppState extends State<MyApp> {
         ),
         initialRoute: '/',
         routes: {
-          '/': (context) => const WelcomeScreen(),
-          '/login': (context) => const LoginScreen(),
-          '/home': (context) => const TabControllerScreen()
+          '/': (context) => const TabControllerScreen(),
         });
   }
 }

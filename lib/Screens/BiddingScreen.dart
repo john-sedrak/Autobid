@@ -104,6 +104,8 @@ class _BiddingScreenState extends State<BiddingScreen> {
   String? errorText;
   bool isLoading = false;
 
+  late DocumentSnapshot sellerSnapshot;
+
   Future<void> refreshCar() {
     final carsRef = FirebaseFirestore.instance.collection('Cars');
     return carsRef.doc(carObj!.id).get().then((carDoc) {
@@ -144,6 +146,7 @@ class _BiddingScreenState extends State<BiddingScreen> {
     final usersRef = FirebaseFirestore.instance.collection('Users');
 
     return usersRef.doc(sellerId).get().then((userDoc) {
+      sellerSnapshot = userDoc;
       Map<String, dynamic> userMap = userDoc.data() as Map<String, dynamic>;
       User sellerTmp = Utils.mapToUser(sellerId, userMap);
       setState(() {
@@ -733,7 +736,7 @@ class _BiddingScreenState extends State<BiddingScreen> {
                                                                 '/messages',
                                                                 arguments: {
                                                               'otherChatter':
-                                                                  seller
+                                                                  sellerSnapshot
                                                             });
                                                         ;
                                                       }

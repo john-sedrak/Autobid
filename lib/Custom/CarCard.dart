@@ -24,12 +24,22 @@ class _CarCardState extends State<CarCard> {
   late DocumentSnapshot sellerSnapshot;
   //update this code when authentication is complete
   String userId = "RoFvf4QhbYY3dybd0nDulXzxLcK2";
+  late User curUser;
 
   @override
   void initState() {
     super.initState();
     _pageController = PageController(viewportFraction: 1, initialPage: 0);
     getSellerUser();
+    getCurrentUser();
+  }
+
+  Future<void> getCurrentUser() async{
+    DocumentSnapshot snap =
+        await FirebaseFirestore.instance.collection('Users').doc(userId).get();
+    Map<String, dynamic> curMap = snap.data() as Map<String, dynamic>;
+    curUser = Utils.mapToUser(userId, curMap);
+    isFav = curUser.favorites.contains(widget.car.id);
   }
 
   void goToBiddingScreen(BuildContext context, {bool isExpanded = false}) {
@@ -77,13 +87,8 @@ class _CarCardState extends State<CarCard> {
   }
 
   Future<void> addToFavorites() async {
-//remove after auth is added
-    // DocumentSnapshot snap =
-    //     await FirebaseFirestore.instance.collection('Users').doc(userId).get();
-    // Map<String, dynamic> curMap = snap.data() as Map<String, dynamic>;
-    // User curUser = Utils.mapToUser(userId, curMap);
-//----------------
-    //Utils.addOrRemoveFromFavorites(curUser, widget.car.id);
+    await getCurrentUser();
+    Utils.addOrRemoveFromFavorites(curUser, widget.car.id);
   }
 
   List<Widget> indicators(imagesLength, currentIndex) {
@@ -200,6 +205,7 @@ class _CarCardState extends State<CarCard> {
                                         onPressed: () {
                                           setState(() {
                                             isFav = !isFav;
+                                            addToFavorites();
                                           });
                                         },
                                         icon: Icon(
@@ -225,13 +231,35 @@ class _CarCardState extends State<CarCard> {
                                 widget.car.year.toString(),
                             style: const TextStyle(
                                 fontSize: 15, fontWeight: FontWeight.bold)),
-                        subtitle: Row(children: [
-                          Icon(Icons.speed),
-                          Text(
-                            addCommas(" ${widget.car.mileage.round()}"),
-                            style: TextStyle(color: Colors.grey),
-                          )
-                        ]),
+                        subtitle: SizedBox(width:50,
+                          child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Container(
+                                child: Row(
+                                  children: [
+                                    Icon(Icons.speed),
+                                    Text(
+                                      addCommas(" ${widget.car.mileage.round()}"),
+                                      style: TextStyle(color: Colors.grey),
+                                    ), 
+                                    Text(' km', style: TextStyle(color: Colors.grey)),
+                                  ],
+                                ),
+                              ),
+                              
+                              
+                              Container(
+                                child: Row(
+                                  children: [
+                                    Icon(Icons.location_pin),
+                                    Text(widget.car.location,style: TextStyle(color: Colors.grey),)
+                                  ],
+                                ),
+                              ),
+                              
+                            ]
+                          ),
+                        ),
                         trailing: Container(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.end,

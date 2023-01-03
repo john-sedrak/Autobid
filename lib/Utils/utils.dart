@@ -35,6 +35,7 @@ class Utils{
         currentBid: double.parse(map["currentBid"].toString()),
         startingPrice: double.parse(map["startingPrice"].toString()),
         sellerDescription: map["description"].toString(),
+        location: map["location"].toString(),
         validUntil: map["validUntil"].toDate());
   }
 

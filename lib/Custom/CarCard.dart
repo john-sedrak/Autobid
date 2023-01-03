@@ -231,7 +231,7 @@ class _CarCardState extends State<CarCard> {
                                 widget.car.year.toString(),
                             style: const TextStyle(
                                 fontSize: 15, fontWeight: FontWeight.bold)),
-                        subtitle: SizedBox(width:50,
+                        subtitle: SizedBox(
                           child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Container(

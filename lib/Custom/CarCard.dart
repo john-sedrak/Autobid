@@ -1,7 +1,6 @@
 import 'package:autobid/Classes/User.dart';
 import 'package:autobid/Utils/utils.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart' as auth;
 
 import '../Classes/Car.dart';
 import 'package:intl/intl.dart';
@@ -24,9 +23,7 @@ class _CarCardState extends State<CarCard> {
   late User seller;
   late DocumentSnapshot sellerSnapshot;
   //update this code when authentication is complete
-  //String userId = "RoFvf4QhbYY3dybd0nDulXzxLcK2";
-  String userId = auth.FirebaseAuth.instance.currentUser!.uid;
-
+  String userId = "RoFvf4QhbYY3dybd0nDulXzxLcK2";
   late User curUser;
 
   @override
@@ -235,7 +232,6 @@ class _CarCardState extends State<CarCard> {
                             style: const TextStyle(
                                 fontSize: 15, fontWeight: FontWeight.bold)),
                         subtitle: SizedBox(
-                          width: 50,
                           child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [

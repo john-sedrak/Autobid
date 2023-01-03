@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:autobid/Classes/Car.dart';
 import 'package:autobid/Custom/FavoriteCard.dart';
+import 'package:autobid/Screens/AuthenticationScreens/errorMessage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -120,6 +121,8 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
       favorites = newFavs;
       isLoading = false;
     });
+
+    showErrorMessage("No internet");
   }
 
   void removeFromFavorites(int index) {
@@ -143,6 +146,15 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
     super.initState();
   }
 
+  void showErrorMessage(String msg) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      backgroundColor: Colors.grey.shade300,
+      elevation: 0,
+      content: Text(msg),
+      behavior: SnackBarBehavior.floating,
+    ));
+  }
+
   @override
   Widget build(BuildContext context) {
     return isLoading && favorites.isEmpty
@@ -153,7 +165,9 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
         : Container(
             child: RefreshIndicator(
             color: Colors.pink,
-            onRefresh: () => Future(getFavorites),
+            onRefresh: () {
+              return Future(getFavorites);
+            },
             child: ListView.builder(
                 itemCount: favorites.length,
                 itemBuilder: (context, index) => Column(

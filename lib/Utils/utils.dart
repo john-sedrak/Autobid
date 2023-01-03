@@ -1,13 +1,10 @@
 import 'package:autobid/Classes/Car.dart';
-import 'package:autobid/Classes/User.dart';
+import 'package:autobid/Classes/UserModel.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-
-
-class Utils{
-
-  static Future<void> dialPhoneNumber(String phoneNumber) async{
+class Utils {
+  static Future<void> dialPhoneNumber(String phoneNumber) async {
     final call = Uri.parse('tel:+20 ${phoneNumber}');
     if (await canLaunchUrl(call)) {
       launchUrl(call);
@@ -15,7 +12,6 @@ class Utils{
       throw 'Could not launch $call';
     }
   }
-
 
   static Car mapToCar(String id, Map<String, dynamic> map) {
     List<String> images = [];
@@ -39,13 +35,13 @@ class Utils{
         validUntil: map["validUntil"].toDate());
   }
 
-  static User mapToUser(String id, Map<String, dynamic> map) {
+  static UserModel mapToUser(String id, Map<String, dynamic> map) {
     List<String> favorites = [];
     for (var img in map["favorites"]) {
       favorites.add(img.toString());
     }
 
-    User u = User(
+    UserModel u = UserModel(
         id: id,
         favorites: favorites,
         name: map["name"].toString(),
@@ -54,7 +50,7 @@ class Utils{
     return u;
   }
 
-  static Future<void> addOrRemoveFromFavorites(User u, String carId) {
+  static Future<void> addOrRemoveFromFavorites(UserModel u, String carId) {
     List<String> favIds = u.favorites;
 
     int index = favIds.indexOf(carId);
@@ -71,4 +67,3 @@ class Utils{
         .update({"favorites": favIds});
   }
 }
-

@@ -6,7 +6,9 @@ import 'package:intl/intl.dart';
 
 class FavoriteCard extends StatefulWidget {
   Car car;
-  FavoriteCard({super.key, required this.car});
+
+  bool sellerCard;
+  FavoriteCard({super.key, required this.car, this.sellerCard = false});
 
   @override
   State<FavoriteCard> createState() => _FavoriteCardState();
@@ -107,40 +109,41 @@ class _FavoriteCardState extends State<FavoriteCard> {
                                   ),
                                 ],
                               )),
-                          Padding(
-                            padding: EdgeInsets.only(top: 10),
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  flex: 8,
-                                  child: OutlinedButton(
-                                    onPressed: () {
-                                      goToBiddingScreen(context,
-                                          isExpanded: true);
-                                    },
-                                    style: ButtonStyle(
-                                      foregroundColor:
-                                          MaterialStateProperty.all(
-                                              Colors.pink),
-                                      overlayColor: MaterialStateProperty.all(
-                                          Colors.pink.shade200),
-                                      side: MaterialStateProperty.all(
-                                          const BorderSide(
-                                              width: 1, color: Colors.pink)),
+                          if (!widget.sellerCard)
+                            Padding(
+                              padding: EdgeInsets.only(top: 10),
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    flex: 8,
+                                    child: OutlinedButton(
+                                      onPressed: () {
+                                        goToBiddingScreen(context,
+                                            isExpanded: true);
+                                      },
+                                      style: ButtonStyle(
+                                        foregroundColor:
+                                            MaterialStateProperty.all(
+                                                Colors.pink),
+                                        overlayColor: MaterialStateProperty.all(
+                                            Colors.pink.shade200),
+                                        side: MaterialStateProperty.all(
+                                            const BorderSide(
+                                                width: 1, color: Colors.pink)),
 
-                                      // side: MaterialStateProperty.all(
-                                      //     Colors.pink),
-                                    ),
-                                    child: const Text(
-                                      "Bid",
-                                      style: TextStyle(
-                                          fontSize: 16, color: Colors.pink),
+                                        // side: MaterialStateProperty.all(
+                                        //     Colors.pink),
+                                      ),
+                                      child: const Text(
+                                        "Bid",
+                                        style: TextStyle(
+                                            fontSize: 16, color: Colors.pink),
+                                      ),
                                     ),
                                   ),
-                                ),
-                              ],
-                            ),
-                          )
+                                ],
+                              ),
+                            )
                         ],
                       ),
                     ))

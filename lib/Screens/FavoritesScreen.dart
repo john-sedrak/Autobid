@@ -14,9 +14,7 @@ class FavoritesScreen extends StatefulWidget {
 }
 
 class _FavoritesScreenState extends State<FavoritesScreen> {
-  //String userId = "RoFvf4QhbYY3dybd0nDulXzxLcK2";
-  String userId = FirebaseAuth.instance.currentUser!.uid;
-
+  String userId = "RoFvf4QhbYY3dybd0nDulXzxLcK2";
   final carsRef = FirebaseFirestore.instance.collection('Cars');
 
   List<Car> favorites = [];
@@ -197,6 +195,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                               )),
                           child: FavoriteCard(
                             car: favorites[index],
+                            sellerCard: favorites[index].sellerID == userId,
                           ),
                         ),
                         if (loaded != favoriteIds.length &&

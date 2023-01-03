@@ -232,24 +232,22 @@ class _CarCardState extends State<CarCard> {
                             style: const TextStyle(
                                 fontSize: 15, fontWeight: FontWeight.bold)),
                         subtitle: SizedBox(
-                          width: 50,
                           child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Container(
-                                  child: Row(
-                                    children: [
-                                      Icon(Icons.speed),
-                                      Text(
-                                        addCommas(
-                                            " ${widget.car.mileage.round()}"),
-                                        style: TextStyle(color: Colors.grey),
-                                      ),
-                                      Text(' km',
-                                          style: TextStyle(color: Colors.grey)),
-                                    ],
-                                  ),
-                                ),
+                                    child: Row(
+                                  children: [
+                                    Icon(Icons.speed),
+                                    Text(
+                                      addCommas(
+                                          " ${widget.car.mileage.round()}"),
+                                      style: TextStyle(color: Colors.grey),
+                                    ),
+                                    Text(' km',
+                                        style: TextStyle(color: Colors.grey)),
+                                  ],
+                                )),
                                 Container(
                                   child: Row(
                                     children: [

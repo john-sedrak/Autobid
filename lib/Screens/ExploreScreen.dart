@@ -79,6 +79,9 @@ class _ExploreScreenState extends State<ExploreScreen> {
               Map<String, dynamic> carMap = carDoc.data() as Map<String, dynamic>;
               _cars.add(mapToCar(carDoc.id, carMap));
               loaded++;
+              if(loaded > 5){
+                return;
+              }
             });
           }
         );
@@ -171,12 +174,14 @@ class _ExploreScreenState extends State<ExploreScreen> {
                   Container( width:500, 
                     child: 
                         ExpansionTile(
+                          tilePadding: EdgeInsets.all(5),
+                          childrenPadding: EdgeInsets.all(5),
                           backgroundColor: Colors.white,
                           collapsedBackgroundColor: Colors.white,
                           maintainState: true,
                           title: const Text('Filter...'),
                           children: [
-                            Row(crossAxisAlignment: CrossAxisAlignment.center,
+                            Row(crossAxisAlignment: CrossAxisAlignment.center, mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text("Price Range: ", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),),
                                 Container(width:100,child: TextField(controller: startPriceController, decoration: InputDecoration(labelText: "From"), keyboardType: TextInputType.number, textAlign: TextAlign.center,)),
@@ -219,7 +224,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                                       ),
                                     
                                   ),
-                                  Container(width: 130,
+                                  Container(width: 100,
                                     
                                       child: TextField(controller: yearValue, keyboardType: TextInputType.number, decoration: InputDecoration(labelText:"Year"),)
                                     

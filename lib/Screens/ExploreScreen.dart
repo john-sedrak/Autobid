@@ -129,12 +129,11 @@ class _ExploreScreenState extends State<ExploreScreen> {
             child: RefreshIndicator(
             color: Colors.pink,
             onRefresh: () => getCars(),
-            child: SizedBox( height: 550,
               child: Stack(
                 children: [
                   Column(
                     children: [
-                      Container(height: 100),
+                      Container(height: 60),
                       Expanded(
                         child: ListView.builder(
                             itemCount: _cars.length,
@@ -226,7 +225,6 @@ class _ExploreScreenState extends State<ExploreScreen> {
                   ),
                 ],
               ),
-            ),
             )
           );
   }

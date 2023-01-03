@@ -1,13 +1,21 @@
 import 'package:autobid/Screens/MessagesScreen.dart';
 import 'package:autobid/Screens/BiddingScreen.dart';
 import 'package:autobid/Screens/AddCarScreen.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'Screens/TabControllerSceen.dart';
 import 'package:firebase_core/firebase_core.dart';
 
 void main(List<String> args) {
   runApp(MyApp());
+  FirebaseMessaging.onBackgroundMessage(background_notif_handler);
 }
+
+Future<void> background_notif_handler(RemoteMessage message) async {
+//await Firebase.initializeApp();
+  print("Handling a background message: ${message.data}");
+}
+
 
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
@@ -20,7 +28,7 @@ class _MyAppState extends State<MyApp> {
   bool _initialized = false;
   bool _error = false;
 
-  void initializeFlutterFire() async {
+  Future<void> initializeFlutterFire() async {
     try {
       // Wait for Firebase to initialize and set `_initialized` state to true
       await Firebase.initializeApp();
@@ -39,7 +47,13 @@ class _MyAppState extends State<MyApp> {
 
   @override
   void initState() {
-    initializeFlutterFire();
+    initializeFlutterFire().then((_) {
+      var fbm = FirebaseMessaging.instance;
+      fbm.requestPermission();
+      FirebaseMessaging.onMessage.listen((message) {
+        print(message.data.toString());
+      });
+    });
     super.initState();
   }
 
@@ -67,7 +81,7 @@ class _MyAppState extends State<MyApp> {
       ),
       initialRoute: '/',
       routes:{
-        '/': (context) => const TabControllerScreen(),
+        '/': (context) => !_initialized?Center(child:CircularProgressIndicator(color: Colors.pink,)):const TabControllerScreen(),
         '/bidRoute': (context) => const BiddingScreen(),
         '/addCar': (context) => const AddCarScreen(),
         '/messages': (context) => MessagesScreen(),

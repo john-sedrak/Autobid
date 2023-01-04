@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:autobid/main.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
@@ -23,12 +24,15 @@ class _UploadPhotosState extends State<UploadPhotos> {
   final ImagePicker _picker = ImagePicker();
 
   Future imgFromGallery() async {
-    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+    final pickedFiles = await _picker.pickMultiImage();
 
     setState(() {
-      if (pickedFile != null) {
-        _photo = File(pickedFile.path);
-        widget.allPhotos.add(_photo);
+      if (pickedFiles != null) {
+        for (XFile pickedFile in pickedFiles) {
+          _photo = File(pickedFile.path);
+          widget.allPhotos.add(_photo);
+        }
+
         //uploadFile();
       } else {
         print('No image selected.');
@@ -83,16 +87,57 @@ class _UploadPhotosState extends State<UploadPhotos> {
               dashPattern: [10, 10],
               color: Colors.grey,
               strokeWidth: 2,
-              child: _photo != null
-                  ? ClipRRect(
-                      borderRadius: BorderRadius.circular(20),
-                      child: Image.file(
-                        _photo!,
-                        width: 350,
-                        height: 400,
-                        fit: BoxFit.fitHeight,
-                      ),
-                    )
+              child: widget.allPhotos.length > 0
+                  ?
+                  // ? ClipRRect(
+                  //     borderRadius: BorderRadius.circular(20),
+                  //     child: Image.file(
+                  //       _photo!,
+                  //       width: 350,
+                  //       height: 400,
+                  //       fit: BoxFit.fitHeight,
+                  //     ),
+                  //   )
+                  Container(
+                      padding: EdgeInsets.all(5),
+                      height: 400,
+                      width: 350,
+                      child: SingleChildScrollView(
+                          child: Column(children: [
+                        Wrap(
+                            children: widget.allPhotos!.map((imageone) {
+                          return Stack(children: [
+                            /// put container first , so the icon will show stacked on top of container
+                            Container(
+                              child: Card(
+                                child: Container(
+                                    height: 100,
+                                    width: 100,
+                                    child: Image.file(imageone)),
+                              ),
+                            ), // your card
+                            Positioned(
+                                top: 2,
+                                right: 0,
+                                child: IconButton(
+                                  icon: Icon(Icons.remove_circle),
+                                  color: Colors.grey[850],
+                                  onPressed: () {
+                                    setState(() {
+                                      widget.allPhotos.remove(imageone);
+                                    });
+                                  },
+                                )),
+                          ]);
+                        }).toList()),
+                        Padding(
+                            padding: EdgeInsets.all(10),
+                            child: Text(
+                              "Click to add more images.",
+                              style: TextStyle(
+                                  color: Colors.grey[800], fontSize: 10),
+                            ))
+                      ])))
                   : Container(
                       decoration: BoxDecoration(
                           color: Colors.grey[200],

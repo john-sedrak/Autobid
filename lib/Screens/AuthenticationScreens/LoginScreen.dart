@@ -86,6 +86,8 @@ class _LoginScreenState extends State<LoginScreen> {
           .doc(authResult.user!.uid)
           .update({'notifToken': token});
       userProvider.fetchUser();
+      // Navigator.of(context)
+      //     .pushNamedAndRemoveUntil('/', (Route<dynamic> route) => false);
       Navigator.of(context).pushReplacementNamed('/');
     }
   }
@@ -155,7 +157,8 @@ class _LoginScreenState extends State<LoginScreen> {
       });
       userProvider.fetchUser();
 
-      Navigator.of(context).pushReplacementNamed('/');
+      Navigator.of(context)
+          .pushNamedAndRemoveUntil('/', (Route<dynamic> route) => false);
     }
   }
 

@@ -68,8 +68,9 @@ class ThirdWelcomeContainer extends StatelessWidget {
                   width: 100,
                   height: 40,
                   child: ElevatedButton(
-                    onPressed: () =>
-                        Navigator.of(context).pushReplacementNamed('/login'),
+                    onPressed: () => Navigator.of(context)
+                        .pushNamedAndRemoveUntil(
+                            '/login', (Route<dynamic> route) => false),
                     child: Text(
                       "Start",
                       style: TextStyle(

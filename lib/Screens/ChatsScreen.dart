@@ -41,8 +41,7 @@ class _ChatsScreenState extends State<ChatsScreen> {
     setState(() {});
   }
 
-  Future<DocumentSnapshot<Map<String, dynamic>>> getChatterFuture(
-      var chatSnapshot) async {
+  Future<DocumentSnapshot<Map<String, dynamic>>> getChatterFuture(var chatSnapshot) async {
     var chat = chatSnapshot.data();
     var chatters = chat['chatters'];
     int otherChatterIndex =
@@ -52,7 +51,7 @@ class _ChatsScreenState extends State<ChatsScreen> {
         as Future<DocumentSnapshot<Map<String, dynamic>>>;
   }
 
-  void populateResultLists(var chats) {
+  void populateFetchedChatLists(var chats) {
     if (chatMaps.isEmpty) {
       for (int i = 0; i < chats.length; i++) {
         var element = chats[i];
@@ -128,7 +127,7 @@ class _ChatsScreenState extends State<ChatsScreen> {
                   var chats = snapshot.data!.docs;
 
                   if (chats.isNotEmpty) {
-                    populateResultLists(chats);
+                    populateFetchedChatLists(chats);
                     return ListView.builder(
                       itemBuilder: (context, index) {
                         return searchResults[index];

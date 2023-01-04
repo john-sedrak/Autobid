@@ -26,6 +26,7 @@ class _CarCardState extends State<CarCard> {
   //update this code when authentication is complete
   String userId = FirebaseAuth.instance.currentUser!.uid;
   late UserModel curUser;
+  bool curUserObtained = false;
 
   @override
   void initState() {
@@ -37,9 +38,10 @@ class _CarCardState extends State<CarCard> {
 
   Future<void> getCurrentUser() async {
     DocumentSnapshot snap =
-        await FirebaseFirestore.instance.collection('Users').doc(userId).get();
+        await FirebaseFirestore.instance.collection('Users').doc(FirebaseAuth.instance.currentUser!.uid).get();
     Map<String, dynamic> curMap = snap.data() as Map<String, dynamic>;
     curUser = Utils.mapToUser(userId, curMap);
+    curUserObtained = true;
     isFav = curUser.favorites.contains(widget.car.id);
   }
 
@@ -56,6 +58,10 @@ class _CarCardState extends State<CarCard> {
   void goToChatScreen(BuildContext context) {
     Navigator.of(context)
         .pushNamed('/messages', arguments: {'otherChatter': sellerSnapshot});
+  }
+  void goToEditingScreen(BuildContext context) {
+    Navigator.of(context)
+        .pushNamed('/medit', arguments: {'carObj': widget.car});
   }
 
   UserModel mapToUserWithoutFavorites(String id, Map<String, dynamic> map) {
@@ -88,11 +94,6 @@ class _CarCardState extends State<CarCard> {
       print(err);
     }
   }
-
-  // Future<void> addToFavorites() async {
-  //   await getCurrentUser();
-  //   Utils.addOrRemoveFromFavorites(curUser, widget.car.id);
-  // }
 
   List<Widget> indicators(imagesLength, currentIndex) {
     var apparentLength;
@@ -308,6 +309,19 @@ class _CarCardState extends State<CarCard> {
                                         fontSize: 25, color: Colors.white),
                                   )),
                               Text('  '),
+                              curUserObtained && curUser.id == seller.id?
+                              CircleAvatar(
+                                  backgroundColor: Colors.grey,
+                                  radius: 15,
+                                  child: IconButton(
+                                      icon: const Icon(Icons.edit,
+                                          color: Colors.white),
+                                      onPressed: () {
+                                        if (_userLoaded) {
+                                          goToEditingScreen(context);
+                                        }
+                                      },
+                                      iconSize: 15)):
                               CircleAvatar(
                                   backgroundColor: Colors.blue,
                                   radius: 15,
@@ -321,6 +335,7 @@ class _CarCardState extends State<CarCard> {
                                       },
                                       iconSize: 15)),
                               Text('   '),
+                              curUserObtained && curUser.id == seller.id?SizedBox.shrink():
                               CircleAvatar(
                                   backgroundColor: Colors.green,
                                   radius: 15,

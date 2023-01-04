@@ -1,4 +1,5 @@
 import 'package:autobid/Providers/UserProvider.dart';
+import 'package:autobid/Screens/AuthenticationScreens/ForgetPasswordScreen.dart';
 import 'package:autobid/Screens/AuthenticationScreens/LoginScreen.dart';
 import 'package:autobid/Screens/AuthenticationScreens/WelcomeScreen.dart';
 import 'package:autobid/Screens/MessagesScreen.dart';
@@ -96,12 +97,15 @@ class _MyAppState extends State<MyApp> {
                 routes: {
                   '/welcome': (context) => const WelcomeScreen(),
                   '/login': (context) => const LoginScreen(),
+                  '/forgetPassword': (context) => const ForgetPasswordScreen(),
                   '/': (context) => const TabControllerScreen(),
                   '/bidRoute': (context) => const BiddingScreen(),
                   '/addCar': (context) => const AddCarScreen(),
                   '/messages': (context) => MessagesScreen(),
                 }),
           )
-        : Container(color: Colors.grey.shade300,);
+        : Container(
+            color: Colors.grey.shade300,
+          );
   }
 }

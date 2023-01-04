@@ -1,4 +1,4 @@
-import 'package:autobid/Classes/User.dart';
+import 'package:autobid/Classes/UserModel.dart';
 import 'package:autobid/Utils/utils.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -20,11 +20,11 @@ class _CarCardState extends State<CarCard> {
   int activePage = 0;
   late PageController _pageController;
   bool _userLoaded = false;
-  late User seller;
+  late UserModel seller;
   late DocumentSnapshot sellerSnapshot;
   //update this code when authentication is complete
   String userId = "RoFvf4QhbYY3dybd0nDulXzxLcK2";
-  late User curUser;
+  late UserModel curUser;
 
   @override
   void initState() {
@@ -34,7 +34,7 @@ class _CarCardState extends State<CarCard> {
     getCurrentUser();
   }
 
-  Future<void> getCurrentUser() async{
+  Future<void> getCurrentUser() async {
     DocumentSnapshot snap =
         await FirebaseFirestore.instance.collection('Users').doc(userId).get();
     Map<String, dynamic> curMap = snap.data() as Map<String, dynamic>;
@@ -52,9 +52,9 @@ class _CarCardState extends State<CarCard> {
         .pushNamed('/messages', arguments: {'otherChatter': sellerSnapshot});
   }
 
-  User mapToUserWithoutFavorites(String id, Map<String, dynamic> map) {
+  UserModel mapToUserWithoutFavorites(String id, Map<String, dynamic> map) {
     print("Username: ${map["name"].toString()}");
-    return User(
+    return UserModel(
         id: id,
         favorites: [],
         name: map["name"].toString(),
@@ -232,33 +232,34 @@ class _CarCardState extends State<CarCard> {
                             style: const TextStyle(
                                 fontSize: 15, fontWeight: FontWeight.bold)),
                         subtitle: SizedBox(
-                          child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Container(
-                                child: Row(
+                          child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Container(
+                                    child: Row(
                                   children: [
                                     Icon(Icons.speed),
                                     Text(
-                                      addCommas(" ${widget.car.mileage.round()}"),
+                                      addCommas(
+                                          " ${widget.car.mileage.round()}"),
                                       style: TextStyle(color: Colors.grey),
-                                    ), 
-                                    Text(' km', style: TextStyle(color: Colors.grey)),
+                                    ),
+                                    Text(' km',
+                                        style: TextStyle(color: Colors.grey)),
                                   ],
+                                )),
+                                Container(
+                                  child: Row(
+                                    children: [
+                                      Icon(Icons.location_pin),
+                                      Text(
+                                        widget.car.location,
+                                        style: TextStyle(color: Colors.grey),
+                                      )
+                                    ],
+                                  ),
                                 ),
-                              ),
-                              
-                              
-                              Container(
-                                child: Row(
-                                  children: [
-                                    Icon(Icons.location_pin),
-                                    Text(widget.car.location,style: TextStyle(color: Colors.grey),)
-                                  ],
-                                ),
-                              ),
-                              
-                            ]
-                          ),
+                              ]),
                         ),
                         trailing: Container(
                           child: Column(

@@ -87,7 +87,7 @@ exports.outBidNotification = functions.firestore
             },
             data: {
               click_action: "FLUTTER_NOTIFICATION_CLICK",
-              screen: "/bidRoot",
+              screen: "/myListingRoute",
               carId: context.params.carID,
             },
           },

@@ -61,7 +61,7 @@ class _CarCardState extends State<CarCard> {
   }
   void goToEditingScreen(BuildContext context) {
     Navigator.of(context)
-        .pushNamed('/medit', arguments: {'carObj': widget.car});
+        .pushNamed('/edit', arguments: {'carObj': widget.car});
   }
 
   UserModel mapToUserWithoutFavorites(String id, Map<String, dynamic> map) {

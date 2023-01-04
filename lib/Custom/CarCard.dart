@@ -53,7 +53,6 @@ class _CarCardState extends State<CarCard> {
   }
 
   UserModel mapToUserWithoutFavorites(String id, Map<String, dynamic> map) {
-    print("Username: ${map["name"].toString()}");
     return UserModel(
         id: id,
         favorites: [],
@@ -77,8 +76,6 @@ class _CarCardState extends State<CarCard> {
             sellerSnapshot.data() as Map<String, dynamic>;
 
         seller = Utils.mapToUser(sellerSnapshot.id, sellerMap);
-        //print(seller.favorites);
-        print(seller.name.substring(0, 1));
         _userLoaded = true;
       });
     } catch (err) {

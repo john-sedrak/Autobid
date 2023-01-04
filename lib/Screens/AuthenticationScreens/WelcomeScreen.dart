@@ -29,9 +29,9 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    if (auth.currentUser != null) {
-      Navigator.of(context).pushReplacementNamed('/');
-    }
+    // if (auth.currentUser != null) {
+    //   Navigator.of(context).pushReplacementNamed('/');
+    // }
   }
 
   void navigateToSignup() {

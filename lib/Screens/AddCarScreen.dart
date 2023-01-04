@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../Lists/brands.dart';
 import 'CarDetails.dart';
@@ -17,6 +18,8 @@ class AddCarScreen extends StatefulWidget {
 }
 
 class _AddCarScreenState extends State<AddCarScreen> {
+  // final FirebaseAuth auth = FirebaseAuth.instance;
+  @override
   final carsRef = FirebaseFirestore.instance.collection('Cars');
   int _currentStep = 0;
   final detailsKey = GlobalKey<FormState>();
@@ -53,6 +56,7 @@ class _AddCarScreenState extends State<AddCarScreen> {
   }
 
   postCar() async {
+    // final User? user = await auth.currentUser;
     carsRef.doc().set({
       'brand': brandDateLocation["brand"],
       'model': modelController.text,

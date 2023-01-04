@@ -4,6 +4,7 @@ import 'package:autobid/Screens/ChatsScreen.dart';
 import 'package:autobid/Utilities/TimeManager.dart';
 import 'package:autobid/Utils/utils.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class MessagesScreen extends StatefulWidget {
@@ -20,7 +21,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
   bool _error = false;
 
   DocumentReference<Map<String, dynamic>> userRef =
-      FirebaseFirestore.instance.doc('Users/' + 'RoFvf4QhbYY3dybd0nDulXzxLcK2');
+      FirebaseFirestore.instance.doc('Users/${FirebaseAuth.instance.currentUser!.uid}');
 
   Future<DocumentSnapshot<Map<String, dynamic>>> createAndRetrieveChat(
       DocumentSnapshot otherChatter) async {

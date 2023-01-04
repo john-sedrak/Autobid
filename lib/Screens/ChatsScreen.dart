@@ -1,4 +1,5 @@
 import 'package:autobid/Custom/ChatTile.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -16,7 +17,7 @@ class _ChatsScreenState extends State<ChatsScreen> {
   var chatMaps = <ChatTile>[];
   bool _error = false;
   DocumentReference<Map<String, dynamic>> userRef =
-      FirebaseFirestore.instance.doc('Users/RoFvf4QhbYY3dybd0nDulXzxLcK2');
+      FirebaseFirestore.instance.doc('Users/${FirebaseAuth.instance.currentUser!.uid}');
 
   void onSearchChanged(String input) {
     searchResults.clear();

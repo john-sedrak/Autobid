@@ -1,4 +1,5 @@
 import 'package:autobid/Utilities/TimeManager.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -16,7 +17,7 @@ class _ChatTileState extends State<ChatTile> {
   bool _latestTextFetched = false;
   bool _error = false;
   DocumentReference<Map<String, dynamic>> userRef =
-      FirebaseFirestore.instance.doc('Users/' + 'RoFvf4QhbYY3dybd0nDulXzxLcK2');
+      FirebaseFirestore.instance.doc('Users/${FirebaseAuth.instance.currentUser!.uid}');
   late DocumentSnapshot<Map<String, dynamic>> otherChatter;
   late Map<String, dynamic> latestText;
 

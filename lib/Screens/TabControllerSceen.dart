@@ -83,6 +83,20 @@ class _TabControllerScreenState extends State<TabControllerScreen> {
                 arguments: {'car': car, 'isExpanded': true});
           }
         });
+      } else if (message.data['screen'] == "/myListingRoute") {
+        String carId = message.data['carId'];
+        FirebaseFirestore.instance.doc("Cars/$carId").get().then((value) {
+          Map<String, dynamic> carMap = value.data() as Map<String, dynamic>;
+          Car car = Utils.mapToCar(carId, carMap);
+
+          if (Navigator.canPop(context)) {
+            Navigator.of(context).pushReplacementNamed('/myListingRoute',
+                arguments: {'car': car});
+          } else {
+            Navigator.of(context)
+                .pushNamed('/myListingRoute', arguments: {'car': car});
+          }
+        });
       }
     });
     super.initState();

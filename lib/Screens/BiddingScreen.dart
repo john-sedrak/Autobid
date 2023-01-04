@@ -19,9 +19,9 @@ class _BiddingScreenState extends State<BiddingScreen> {
   int activePage = 0;
   late PageController _pageController;
 
-  String userID = "RoFvf4QhbYY3dybd0nDulXzxLcK2";
+  String userID = FirebaseAuth.instance.currentUser!.uid;
+  //"RoFvf4QhbYY3dybd0nDulXzxLcK2";
   UserModel? currentUser;
-
   UserModel? seller;
 
   var inputController = TextEditingController();
@@ -33,9 +33,6 @@ class _BiddingScreenState extends State<BiddingScreen> {
   @override
   void initState() {
     super.initState();
-    addToFavorites();
-    //--------------remove when auth-----------------------
-    userID = FirebaseAuth.instance.currentUser!.uid;
     FirebaseFirestore.instance
         .collection('Users')
         .doc(userID)
@@ -46,17 +43,29 @@ class _BiddingScreenState extends State<BiddingScreen> {
         currentUser = Utils.mapToUser(userID, curMap);
       });
     });
-    //---------------------------------------------------------
+
+    Future.delayed(Duration(seconds: 1)).then((value) {
+      var carsInstance =
+          FirebaseFirestore.instance.collection("Cars").doc(carObj!.id);
+      var stream = carsInstance.snapshots();
+      stream.listen((snapshot) {
+        Map<String, dynamic> carMap = snapshot.data() as Map<String, dynamic>;
+        setState(() {
+          carObj = Utils.mapToCar(carObj!.id, carMap);
+        });
+      });
+    });
+
     _pageController = PageController(viewportFraction: 1, initialPage: 0);
   }
 
-  Future<void> addToFavorites() async {
-    final usersRef = FirebaseFirestore.instance.collection('Users');
-    DocumentSnapshot userDoc = await usersRef.doc(userID).get();
-    Map<String, dynamic> userMap = userDoc.data() as Map<String, dynamic>;
-    UserModel currentUser = Utils.mapToUser(userID, userMap);
-    // print(currentUser.favorites);
-  }
+  // Future<void> addToFavorites() async {
+  //   final usersRef = FirebaseFirestore.instance.collection('Users');
+  //   DocumentSnapshot userDoc = await usersRef.doc(userID).get();
+  //   Map<String, dynamic> userMap = userDoc.data() as Map<String, dynamic>;
+  //   UserModel currentUser = Utils.mapToUser(userID, userMap);
+  //   // print(currentUser.favorites);
+  // }
 
   List<Widget> indicators(imagesLength, currentIndex) {
     var apparentLength;

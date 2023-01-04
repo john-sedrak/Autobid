@@ -5,8 +5,11 @@ import 'package:autobid/Screens/AuthenticationScreens/WelcomeScreen.dart';
 import 'package:autobid/Screens/MessagesScreen.dart';
 import 'package:autobid/Screens/BiddingScreen.dart';
 import 'package:autobid/Screens/AddCarScreen.dart';
+import 'package:autobid/Screens/myListingScreen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:loading_indicator/loading_indicator.dart';
 import 'Screens/TabControllerSceen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
@@ -31,6 +34,7 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   bool _initialized = false;
   bool _error = false;
+  var auth;
 
   Future<void> initializeFlutterFire() async {
     try {
@@ -52,6 +56,7 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     initializeFlutterFire().then((_) {
+      auth = FirebaseAuth.instance;
       var fbm = FirebaseMessaging.instance;
       fbm.requestPermission();
       FirebaseMessaging.onMessage.listen((message) {
@@ -64,38 +69,45 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (ctx) => UserProvider(),
-      child: MaterialApp(
-          title: "AutoBid",
-          theme: ThemeData(
-            colorScheme: ColorScheme(
-              brightness: Brightness.light,
-              primary: Colors.white,
-              onPrimary: Colors.black,
-              secondary: Colors.pink,
-              onSecondary: Colors.white,
-              error: Colors.white,
-              onError: Colors.pink,
-              background: Colors.grey.shade300,
-              onBackground: Colors.black,
-              surface: Colors.white,
-              onSurface: Colors.black,
-            ),
-            appBarTheme: AppBarTheme(
-                elevation: 0, backgroundColor: Colors.grey.shade300),
-            scaffoldBackgroundColor: Colors.grey.shade300,
-            //useMaterial3: true
-          ),
-          initialRoute: '/welcome',
-          routes: {
-            '/welcome': (context) => const WelcomeScreen(),
-            '/login': (context) => const LoginScreen(),
-            '/': (context) => const TabControllerScreen(),
-            '/bidRoute': (context) => const BiddingScreen(),
-            '/addCar': (context) => const AddCarScreen(),
-            '/messages': (context) => MessagesScreen(),
-          }),
-    );
+    return (_initialized)
+        ? ChangeNotifierProvider(
+            create: (ctx) => UserProvider(),
+            child: MaterialApp(
+                title: "AutoBid",
+                theme: ThemeData(
+                  colorScheme: ColorScheme(
+                    brightness: Brightness.light,
+                    primary: Colors.white,
+                    onPrimary: Colors.black,
+                    secondary: Colors.pink,
+                    onSecondary: Colors.white,
+                    error: Colors.white,
+                    onError: Colors.pink,
+                    background: Colors.grey.shade300,
+                    onBackground: Colors.black,
+                    surface: Colors.white,
+                    onSurface: Colors.black,
+                  ),
+                  appBarTheme: AppBarTheme(
+                      elevation: 0, backgroundColor: Colors.grey.shade300),
+                  scaffoldBackgroundColor: Colors.grey.shade300,
+                  //useMaterial3: true
+                ),
+                initialRoute: (auth != null && auth.currentUser == null)
+                    ? '/welcome'
+                    : '/',
+                routes: {
+                  '/welcome': (context) => const WelcomeScreen(),
+                  '/login': (context) => const LoginScreen(),
+                  '/': (context) => const TabControllerScreen(),
+                  '/bidRoute': (context) => const BiddingScreen(),
+                  '/myListingRoute': (context) => const MyListingScreen(),
+                  '/addCar': (context) => const AddCarScreen(),
+                  '/messages': (context) => MessagesScreen(),
+                }),
+          )
+        : Container(
+            color: Colors.green.shade300,
+          );
   }
 }

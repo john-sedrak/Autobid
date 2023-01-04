@@ -1,4 +1,5 @@
 import 'package:autobid/Classes/Car.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
@@ -16,8 +17,13 @@ class FavoriteCard extends StatefulWidget {
 
 class _FavoriteCardState extends State<FavoriteCard> {
   void goToBiddingScreen(BuildContext context, {bool isExpanded = false}) {
-    Navigator.of(context).pushNamed('/bidRoute',
-        arguments: {'car': widget.car, 'isExpanded': isExpanded});
+    if (widget.car.sellerID == FirebaseAuth.instance.currentUser!.uid) {
+      Navigator.of(context)
+          .pushNamed('/myListingRoute', arguments: {'car': widget.car});
+    } else {
+      Navigator.of(context).pushNamed('/bidRoute',
+          arguments: {'car': widget.car, 'isExpanded': isExpanded});
+    }
   }
 
   String addCommas(String s) {

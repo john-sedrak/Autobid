@@ -1,6 +1,7 @@
 import 'package:autobid/Classes/UserModel.dart';
 import 'package:autobid/Utils/utils.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import '../Classes/Car.dart';
 import 'package:intl/intl.dart';
@@ -23,7 +24,7 @@ class _CarCardState extends State<CarCard> {
   late UserModel seller;
   late DocumentSnapshot sellerSnapshot;
   //update this code when authentication is complete
-  String userId = "RoFvf4QhbYY3dybd0nDulXzxLcK2";
+  String userId = FirebaseAuth.instance.currentUser!.uid;
   late UserModel curUser;
 
   @override
@@ -43,8 +44,13 @@ class _CarCardState extends State<CarCard> {
   }
 
   void goToBiddingScreen(BuildContext context, {bool isExpanded = false}) {
-    Navigator.of(context).pushNamed('/bidRoute',
-        arguments: {'car': widget.car, 'isExpanded': isExpanded});
+    if (widget.car.sellerID == FirebaseAuth.instance.currentUser!.uid) {
+      Navigator.of(context)
+          .pushNamed('/myListingRoute', arguments: {'car': widget.car});
+    } else {
+      Navigator.of(context).pushNamed('/bidRoute',
+          arguments: {'car': widget.car, 'isExpanded': isExpanded});
+    }
   }
 
   void goToChatScreen(BuildContext context) {
@@ -86,10 +92,10 @@ class _CarCardState extends State<CarCard> {
     }
   }
 
-  Future<void> addToFavorites() async {
-    await getCurrentUser();
-    Utils.addOrRemoveFromFavorites(curUser, widget.car.id);
-  }
+  // Future<void> addToFavorites() async {
+  //   await getCurrentUser();
+  //   Utils.addOrRemoveFromFavorites(curUser, widget.car.id);
+  // }
 
   List<Widget> indicators(imagesLength, currentIndex) {
     var apparentLength;
@@ -203,10 +209,11 @@ class _CarCardState extends State<CarCard> {
                                     children: [
                                       IconButton(
                                         onPressed: () {
-                                          setState(() {
-                                            isFav = !isFav;
-                                            addToFavorites();
-                                          });
+                                          Utils.addOrRemoveFromFavorites(
+                                                  curUser, widget.car.id)
+                                              .then((value) => setState(() {
+                                                    isFav = !isFav;
+                                                  }));
                                         },
                                         icon: Icon(
                                             isFav

@@ -1,8 +1,11 @@
+import 'package:autobid/Classes/Car.dart';
 import 'package:autobid/Custom/CustomAppBar.dart';
 import 'package:autobid/Custom/MainDrawer.dart';
+import 'package:autobid/Utils/utils.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:provider/provider.dart';
 
 import 'ChatsScreen.dart';
 import 'ExploreScreen.dart';
@@ -28,7 +31,7 @@ class _TabControllerScreenState extends State<TabControllerScreen> {
     'Explore',
     'Chats',
     'Listings',
-    'Favorites',
+    'Following',
   ];
 
   int pageIndex = 0;
@@ -46,6 +49,10 @@ class _TabControllerScreenState extends State<TabControllerScreen> {
   @override
   void initState() {
     // TODO: implement initState
+    FirebaseMessaging.instance
+        .getToken()
+        .then((value) => print("token:  $value"));
+
     FirebaseMessaging.onMessageOpenedApp.listen((message) {
       print('opened notification');
 
@@ -60,6 +67,20 @@ class _TabControllerScreenState extends State<TabControllerScreen> {
           } else {
             Navigator.of(context).pushNamed(message.data['screen'],
                 arguments: {'otherChatter': otherChatter});
+          }
+        });
+      } else if (message.data['screen'] == '/bidRoot') {
+        String carId = message.data['carId'];
+        FirebaseFirestore.instance.doc("Cars/$carId").get().then((value) {
+          Map<String, dynamic> carMap = value.data() as Map<String, dynamic>;
+          Car car = Utils.mapToCar(carId, carMap);
+
+          if (Navigator.canPop(context)) {
+            Navigator.of(context).pushReplacementNamed('/bidRoute',
+                arguments: {'car': car, 'isExpanded': true});
+          } else {
+            Navigator.of(context).pushNamed('/bidRoute',
+                arguments: {'car': car, 'isExpanded': true});
           }
         });
       }

@@ -1,7 +1,9 @@
 import 'package:autobid/Classes/Car.dart';
 import 'package:autobid/Classes/UserModel.dart';
 import 'package:autobid/Custom/CustomAppBar.dart';
+import 'package:autobid/Screens/AuthenticationScreens/errorMessage.dart';
 import 'package:autobid/Utils/utils.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
@@ -17,9 +19,9 @@ class _BiddingScreenState extends State<BiddingScreen> {
   int activePage = 0;
   late PageController _pageController;
 
-  String userID = "RoFvf4QhbYY3dybd0nDulXzxLcK2";
+  String userID = FirebaseAuth.instance.currentUser!.uid;
+  //"RoFvf4QhbYY3dybd0nDulXzxLcK2";
   UserModel? currentUser;
-
   UserModel? seller;
 
   var inputController = TextEditingController();
@@ -31,8 +33,10 @@ class _BiddingScreenState extends State<BiddingScreen> {
   @override
   void initState() {
     super.initState();
-    addToFavorites();
-    //--------------remove when auth-----------------------
+    setState(() {
+      isLoading = true;
+    });
+
     FirebaseFirestore.instance
         .collection('Users')
         .doc(userID)
@@ -43,17 +47,38 @@ class _BiddingScreenState extends State<BiddingScreen> {
         currentUser = Utils.mapToUser(userID, curMap);
       });
     });
-    //---------------------------------------------------------
+
+    Future.delayed(const Duration(seconds: 0)).then((value) {
+      var carsInstance =
+          FirebaseFirestore.instance.collection("Cars").doc(carObj!.id);
+      var stream = carsInstance.snapshots();
+      stream.listen((snapshot) {
+        try {
+          Map<String, dynamic> carMap = snapshot.data() as Map<String, dynamic>;
+          setState(() {
+            carObj = Utils.mapToCar(carObj!.id, carMap);
+            isLoading = false;
+          });
+        } catch (e) {
+          if (e.toString() ==
+              "type 'Null' is not a subtype of type 'Map<String, dynamic>' in type cast") {
+            showErrorMessage("Error! Cannot load car data!");
+            Navigator.of(context).pop();
+          }
+        }
+      });
+    });
+
     _pageController = PageController(viewportFraction: 1, initialPage: 0);
   }
 
-  Future<void> addToFavorites() async {
-    final usersRef = FirebaseFirestore.instance.collection('Users');
-    DocumentSnapshot userDoc = await usersRef.doc(userID).get();
-    Map<String, dynamic> userMap = userDoc.data() as Map<String, dynamic>;
-    UserModel currentUser = Utils.mapToUser(userID, userMap);
-    // print(currentUser.favorites);
-  }
+  // Future<void> addToFavorites() async {
+  //   final usersRef = FirebaseFirestore.instance.collection('Users');
+  //   DocumentSnapshot userDoc = await usersRef.doc(userID).get();
+  //   Map<String, dynamic> userMap = userDoc.data() as Map<String, dynamic>;
+  //   UserModel currentUser = Utils.mapToUser(userID, userMap);
+  //   // print(currentUser.favorites);
+  // }
 
   List<Widget> indicators(imagesLength, currentIndex) {
     var apparentLength;
@@ -104,14 +129,23 @@ class _BiddingScreenState extends State<BiddingScreen> {
   String? errorText;
   bool isLoading = false;
 
+  late DocumentSnapshot sellerSnapshot;
+
   Future<void> refreshCar() {
     final carsRef = FirebaseFirestore.instance.collection('Cars');
     return carsRef.doc(carObj!.id).get().then((carDoc) {
-      Map<String, dynamic> carMap = carDoc.data() as Map<String, dynamic>;
-      Car carTmp = Utils.mapToCar(carObj!.id, carMap);
-      setState(() {
-        carObj = carTmp;
-      });
+      try {
+        Map<String, dynamic> carMap = carDoc.data() as Map<String, dynamic>;
+        Car carTmp = Utils.mapToCar(carObj!.id, carMap);
+        setState(() {
+          carObj = carTmp;
+        });
+      } catch (e) {
+        if (e.toString() ==
+            "type 'Null' is not a subtype of type 'Map<String, dynamic>' in type cast") {
+          showErrorMessage("Error! Cannot load car data!");
+        }
+      }
     });
   }
 
@@ -119,13 +153,28 @@ class _BiddingScreenState extends State<BiddingScreen> {
     setState(() {
       isLoading = true;
     });
+
+    List<Future> futures = [];
+
     final docRef =
         FirebaseFirestore.instance.collection('Cars').doc(carObj!.id);
-    // print(carObj!.id);
-//NEED TO NOTIFY OR SEND A PUSH NOTIFICATION TO OLD BIDDER
     Navigator.pop(ctx, 'OK');
-    return docRef.update(
+    Future up = docRef.update(
         {"currentBid": double.parse(inputController.text), "bidderID": userID});
+
+    futures.add(up);
+
+    if (!currentUser!.favorites.contains(carObj!.id)) {
+      List<String> newFavs = currentUser!.favorites;
+      newFavs.add(carObj!.id);
+      Future up2 =
+          FirebaseFirestore.instance.doc("Users/${currentUser!.id}").update({
+        "favorites": newFavs,
+      });
+      futures.add(up2);
+    }
+
+    return Future.wait(futures);
   }
 
   void placeBid() {
@@ -144,6 +193,7 @@ class _BiddingScreenState extends State<BiddingScreen> {
     final usersRef = FirebaseFirestore.instance.collection('Users');
 
     return usersRef.doc(sellerId).get().then((userDoc) {
+      sellerSnapshot = userDoc;
       Map<String, dynamic> userMap = userDoc.data() as Map<String, dynamic>;
       UserModel sellerTmp = Utils.mapToUser(sellerId, userMap);
       setState(() {
@@ -188,15 +238,26 @@ class _BiddingScreenState extends State<BiddingScreen> {
           //   child: const Text('OK'),
           // ),
           ElevatedButton(
-            onPressed: () => updateBid(context).then((value) async {
-              inputController.clear();
-              await refreshCar();
-              setState(() {
-                isExpanded = !isExpanded;
-                errorText = null;
-                isLoading = false;
-              });
-            }),
+            onPressed: () => updateBid(context)
+                .then((value) async {
+                  inputController.clear();
+                  await refreshCar();
+                  setState(() {
+                    isExpanded = !isExpanded;
+                    errorText = null;
+                    isLoading = false;
+                  });
+                })
+                .timeout(Duration(seconds: 10))
+                .catchError((errorText) {
+                  showErrorMessage(
+                      "Your bid will be confirmed once you connect to the internet.");
+                  setState(() {
+                    isExpanded = !isExpanded;
+                    errorText = null;
+                    isLoading = false;
+                  });
+                }),
             child: Text(
               " Confirm ",
               style: TextStyle(fontSize: 18),
@@ -214,6 +275,18 @@ class _BiddingScreenState extends State<BiddingScreen> {
     );
   }
 
+  void showErrorMessage(String msg) {
+    Future.delayed(Duration(seconds: 0))
+        .then((_) => ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              backgroundColor: Color.fromARGB(0, 255, 255, 255),
+              elevation: 0,
+              content: errorMessage(
+                message: msg,
+              ),
+              behavior: SnackBarBehavior.fixed,
+            )));
+  }
+
   bool onStart = true;
   @override
   Widget build(BuildContext context) {
@@ -227,9 +300,16 @@ class _BiddingScreenState extends State<BiddingScreen> {
         carObj = car;
         isLoading = true;
       });
-      getSeller(car.sellerID).then((value) => setState(() {
-            isLoading = false;
-          }));
+      try {
+        getSeller(car.sellerID).then((value) => setState(() {
+              isLoading = false;
+            }));
+      } catch (e) {
+        showErrorMessage("Connection Error! Could not load Content.");
+        setState(() {
+          isLoading = false;
+        });
+      }
     } else {
       car = carObj!;
     }
@@ -278,6 +358,8 @@ class _BiddingScreenState extends State<BiddingScreen> {
         errorText = null;
       });
     }
+
+    bool bidExpired = DateTime.now().isAfter(carObj!.validUntil);
 
     return Scaffold(
         appBar: CustomAppBar(title: "Car Details"),
@@ -382,11 +464,29 @@ class _BiddingScreenState extends State<BiddingScreen> {
                           child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  car.brand,
-                                  style: TextStyle(
-                                      fontSize: 32,
-                                      fontWeight: FontWeight.bold),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      car.brand,
+                                      style: TextStyle(
+                                          fontSize: 32,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      children: [
+                                        Icon(Icons.location_pin,
+                                            color: Colors.blueGrey),
+                                        Text(
+                                          car.location,
+                                          style:
+                                              TextStyle(color: Colors.blueGrey),
+                                        )
+                                      ],
+                                    )
+                                  ],
                                 ),
                                 Text(
                                   "${car.model}, ${car.year}",
@@ -600,19 +700,21 @@ class _BiddingScreenState extends State<BiddingScreen> {
                                           width: double.infinity,
                                           height: 40,
                                           child: ElevatedButton(
-                                            onPressed: isMyBid
+                                            onPressed: isMyBid || bidExpired
                                                 ? null
                                                 : () => placeBid(),
                                             child: Text(
                                               isMyBid
                                                   ? "You Placed The Highest Bid!"
-                                                  : "Place Your Bid",
+                                                  : bidExpired
+                                                      ? "Bidding is over!"
+                                                      : "Place Your Bid",
                                               style: TextStyle(fontSize: 18),
                                             ),
                                             style: ButtonStyle(
                                                 backgroundColor:
                                                     MaterialStateProperty.all(
-                                                        isMyBid
+                                                        isMyBid || bidExpired
                                                             ? Color.fromARGB(
                                                                 255, 65, 23, 37)
                                                             : Colors.pink),
@@ -622,9 +724,8 @@ class _BiddingScreenState extends State<BiddingScreen> {
                                                 shape: MaterialStateProperty.all<
                                                         RoundedRectangleBorder>(
                                                     RoundedRectangleBorder(
-                                                        borderRadius:
-                                                            BorderRadius.circular(15.0),
-                                                        side: BorderSide(color: isMyBid ? Color.fromARGB(255, 65, 23, 37) : Colors.pink)))),
+                                                        borderRadius: BorderRadius.circular(15.0),
+                                                        side: BorderSide(color: isMyBid || bidExpired ? Color.fromARGB(255, 65, 23, 37) : Colors.pink)))),
                                           ),
                                         )),
                                 ],
@@ -733,7 +834,7 @@ class _BiddingScreenState extends State<BiddingScreen> {
                                                                 '/messages',
                                                                 arguments: {
                                                               'otherChatter':
-                                                                  seller
+                                                                  sellerSnapshot
                                                             });
                                                         ;
                                                       }

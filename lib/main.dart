@@ -1,9 +1,11 @@
+import 'package:autobid/Classes/UserModel.dart';
 import 'package:autobid/Providers/UserProvider.dart';
 import 'package:autobid/Screens/AuthenticationScreens/LoginScreen.dart';
 import 'package:autobid/Screens/AuthenticationScreens/WelcomeScreen.dart';
 import 'package:autobid/Screens/MessagesScreen.dart';
 import 'package:autobid/Screens/BiddingScreen.dart';
 import 'package:autobid/Screens/AddCarScreen.dart';
+import 'package:autobid/Screens/myListingScreen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -61,6 +63,7 @@ class _MyAppState extends State<MyApp> {
         print(message.data.toString());
       });
     });
+
     super.initState();
   }
 
@@ -98,10 +101,13 @@ class _MyAppState extends State<MyApp> {
                   '/login': (context) => const LoginScreen(),
                   '/': (context) => const TabControllerScreen(),
                   '/bidRoute': (context) => const BiddingScreen(),
+                  '/myListingRoute': (context) => const MyListingScreen(),
                   '/addCar': (context) => const AddCarScreen(),
                   '/messages': (context) => MessagesScreen(),
                 }),
           )
-        : Container(color: Colors.grey.shade300,);
+        : Container(
+            color: Colors.grey.shade300,
+          );
   }
 }

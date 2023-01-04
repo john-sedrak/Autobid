@@ -1,4 +1,5 @@
 import 'package:autobid/Custom/CustomAppBar.dart';
+import 'package:autobid/Custom/MainDrawer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -70,6 +71,7 @@ class _TabControllerScreenState extends State<TabControllerScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(title: labels[pageIndex]),
+      drawer: const MainDrawer(),
       body: pages[pageIndex],
       floatingActionButton: pageIndex == 0 || pageIndex == 2
           ? FloatingActionButton(

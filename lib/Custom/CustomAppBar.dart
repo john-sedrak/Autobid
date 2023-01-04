@@ -28,6 +28,17 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                 ),
               );
             }
+            else if (Scaffold.of(context).hasDrawer){
+              return Container(
+                child: IconButton(alignment: Alignment.topCenter,
+                  icon: const Icon(Icons.menu),
+                  onPressed: () {
+                    Scaffold.of(context).openDrawer();
+                  },
+                  tooltip: MaterialLocalizations.of(context).openAppDrawerTooltip,
+                ),
+              );
+            }
             else{
               return Container();
             }

@@ -86,6 +86,8 @@ class _LoginScreenState extends State<LoginScreen> {
           .doc(authResult.user!.uid)
           .update({'notifToken': token});
       userProvider.fetchUser();
+      // Navigator.of(context)
+      //     .pushNamedAndRemoveUntil('/', (Route<dynamic> route) => false);
       Navigator.of(context).pushReplacementNamed('/');
     }
   }
@@ -131,18 +133,6 @@ class _LoginScreenState extends State<LoginScreen> {
     try {
       authResult = await authenticationInstance.createUserWithEmailAndPassword(
           email: email, password: password);
-    } on FirebaseAuthException catch (e) {
-      if (e.code == 'weak-password') {
-        showErrorMessage('The password provided is too weak.');
-      }
-      if (e.code == 'invalid-email') {
-        showErrorMessage('Invalid Email address.');
-      } else if (e.code == 'email-already-in-use') {
-        showErrorMessage('Email already exists.');
-      }
-    }
-
-    if (authResult != null) {
       await FirebaseFirestore.instance
           .collection('Users')
           .doc(authResult.user!.uid)
@@ -155,8 +145,23 @@ class _LoginScreenState extends State<LoginScreen> {
       });
       userProvider.fetchUser();
 
-      Navigator.of(context).pushReplacementNamed('/');
+      Navigator.of(context)
+          .pushNamedAndRemoveUntil('/', (Route<dynamic> route) => false);
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'weak-password') {
+        showErrorMessage('The password provided is too weak.');
+      }
+      if (e.code == 'invalid-email') {
+        showErrorMessage('Invalid Email address.');
+      } else if (e.code == 'email-already-in-use') {
+        showErrorMessage('Email already exists.');
+      }
     }
+  }
+
+  void navigateToForget() {
+    print('forgetiing');
+    Navigator.of(context).pushNamed('/forgetPassword');
   }
 
   @override
@@ -228,6 +233,21 @@ class _LoginScreenState extends State<LoginScreen> {
                               ],
                             ),
                           ),
+                          if (!authenticationMode)
+                            Container(
+                              width: 270,
+                              child: InkWell(
+                                onTap: navigateToForget,
+                                child: const Text(
+                                  "Forgot Password?",
+                                  style: TextStyle(
+                                      color: Colors.blueAccent,
+                                      fontSize: 12,
+                                      decoration: TextDecoration.underline),
+                                  textAlign: TextAlign.right,
+                                ),
+                              ),
+                            ),
                           Container(
                               width: double.infinity,
                               margin: const EdgeInsets.only(top: 15),
@@ -236,7 +256,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   width: 270,
                                   child: ElevatedButton(
                                     style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.pink.shade300,
+                                        backgroundColor: Colors.pink,
                                         shape: RoundedRectangleBorder(
                                           borderRadius:
                                               BorderRadius.circular(30),
@@ -247,8 +267,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                       (authenticationMode)
                                           ? "Sign Up"
                                           : "Login",
-                                      style: TextStyle(
-                                          color: Colors.grey.shade300),
+                                      style: TextStyle(color: Colors.white),
                                     ),
                                   ),
                                 ),
@@ -267,17 +286,17 @@ class _LoginScreenState extends State<LoginScreen> {
                                       style: TextStyle(fontSize: 12),
                                     ),
                                     InkWell(
+                                      onTap: changeMode,
                                       child: Text(
                                         (authenticationMode)
                                             ? "LOGIN"
                                             : "SIGN UP",
-                                        style: TextStyle(
+                                        style: const TextStyle(
                                             color: Colors.blueAccent,
                                             fontSize: 12,
                                             decoration:
                                                 TextDecoration.underline),
                                       ),
-                                      onTap: changeMode,
                                     )
                                   ]),
                             ),

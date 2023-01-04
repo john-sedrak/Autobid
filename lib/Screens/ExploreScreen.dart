@@ -62,6 +62,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
 
     var stream = carsRef.snapshots();
 
+
     stream.listen(
       (snapshot) {
         snapshot.docs.forEach(
@@ -75,34 +76,31 @@ class _ExploreScreenState extends State<ExploreScreen> {
         );
       }
     );
+
   }
 
-  Future<void> getBrandModelInfo() async{
+  Future<void> getBrandModelInfo() async {
     final data = await rootBundle.loadString('assets/brandModelInfo.json');
 
     brandModelInfo = await json.decode(data);
-
-    
 
     setState(() {
       listOfAllBrands = brandModelInfo.keys.toList();
       listOfAllBrands.sort();
       listOfBrands = List.from(listOfAllBrands);
     });
-
   }
 
   void updateModelList(List<dynamic> brands) {
-
     List<dynamic> modelList = [];
 
-    brands.forEach((brand) { 
+    brands.forEach((brand) {
       modelList = brandModelInfo[brand];
 
-      modelList.forEach((element) {listOfModels.add(element['Name']);});
+      modelList.forEach((element) {
+        listOfModels.add(element['Name']);
+      });
     });
-
-
   }
 
   @override
@@ -167,6 +165,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
 
   @override
   Widget build(BuildContext context) {
+
     return _error? Text("Error"):
         (isLoading || !_initialized) && _cars.isEmpty
         ? Center(
@@ -208,12 +207,23 @@ class _ExploreScreenState extends State<ExploreScreen> {
                   Container( width:500,decoration: BoxDecoration(
                       boxShadow: [
                         BoxShadow(blurRadius: 5.0, spreadRadius: 3, color: Colors.grey.shade400)
+
                       ],
-                      borderRadius: BorderRadius.circular(20),
-                      color: Colors.grey.shade200,
                     ),
-                    child: 
-                        ClipRRect( borderRadius: BorderRadius.all(Radius.circular(20)),
+                    Container(
+                        width: 500,
+                        decoration: BoxDecoration(
+                          boxShadow: [
+                            BoxShadow(
+                                blurRadius: 5.0,
+                                spreadRadius: 3,
+                                color: Colors.grey.shade400)
+                          ],
+                          borderRadius: BorderRadius.circular(20),
+                          color: Colors.grey.shade200,
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.all(Radius.circular(20)),
                           child: ExpansionTile(
                             iconColor: Colors.grey,
                             collapsedIconColor: Colors.grey,
@@ -253,18 +263,23 @@ class _ExploreScreenState extends State<ExploreScreen> {
                                               
                                             });
                                           },
-                                          chipDisplay: MultiSelectChipDisplay(scroll: true, textStyle: TextStyle(color: Colors.white), chipColor: Colors.pinkAccent,),
+                                          chipDisplay: MultiSelectChipDisplay(
+                                            scroll: true,
+                                            textStyle:
+                                                TextStyle(color: Colors.white),
+                                            chipColor: Colors.pinkAccent,
+                                          ),
                                           searchable: true,
                                           title: const Text('Brand'),
                                           searchHint: 'Brand...',
                                           buttonText: const Text('Brand'),
                                         ),
-                                      
-                                    ),
-                                    Container(width: 140,
-                                      
+                                      ),
+                                      Container(
+                                        width: 140,
                                         child: MultiSelectDialogField(
                                           decoration: BoxDecoration(
+
                                             border: Border.all(),
                                             borderRadius: BorderRadius.circular(10)
                                           ),
@@ -313,18 +328,52 @@ class _ExploreScreenState extends State<ExploreScreen> {
                                           buttonText: const Text('Year'),
                                         ),
                                   ),
-                                  ],
                                 ),
-                              ),
-                              Container(height:50,
-                                child: Row(children: [
-                                  Expanded(child: Divider(color: Colors.grey)),
-                                  Text(" Price Range ", style: TextStyle(color: Colors.grey)),
-                                  Expanded(child: Divider(color: Colors.grey)),
-                                ],),
-                              ),
-                              Container( width: 300,
-                                child: Row(crossAxisAlignment: CrossAxisAlignment.center, mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                Container(
+                                  width: 300,
+                                  child: Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        SizedBox(
+                                            width: 80,
+                                            child: TextField(
+                                              controller: startPriceController,
+                                              decoration: InputDecoration(
+                                                  contentPadding:
+                                                      EdgeInsets.all(5),
+                                                  border: OutlineInputBorder(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              10))),
+                                              keyboardType:
+                                                  TextInputType.number,
+                                              textAlign: TextAlign.center,
+                                            )),
+                                        Icon(Icons.arrow_forward),
+                                        SizedBox(
+                                            width: 80,
+                                            child: TextField(
+                                              controller: endPriceController,
+                                              decoration: InputDecoration(
+                                                  contentPadding:
+                                                      EdgeInsets.all(5),
+                                                  border: OutlineInputBorder(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              10))),
+                                              keyboardType:
+                                                  TextInputType.number,
+                                              textAlign: TextAlign.center,
+                                            )),
+                                        Text(" EGP")
+                                      ]),
+                                ),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
                                     SizedBox(width:80,
                                       child: TextField(
@@ -359,8 +408,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                                         },
                                       )
                                     ),
-                                    Text(" EGP")
-                                  ]
+                                  ],
                                 ),
                               ),
                               Row( mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -407,9 +455,14 @@ class _ExploreScreenState extends State<ExploreScreen> {
                                         Text(" km")
                                       ],
                                     ),
-                                  ),
-                                  Container(height: 110,child: Expanded(child: VerticalDivider(color: Colors.grey, thickness: 1))),
-                                  Container(width: 170,
+                                    Container(
+                                        // height: 110, //causes a weird error in console for some reason
+                                        child: Expanded(
+                                            child: VerticalDivider(
+                                                color: Colors.grey,
+                                                thickness: 1))),
+                                    Container(
+                                      width: 170,
                                       child: Center(
                                         
                                           child: MultiSelectDialogField(
@@ -435,22 +488,19 @@ class _ExploreScreenState extends State<ExploreScreen> {
                                             searchHint: 'Location...',
                                             buttonText: const Text('Location'),
                                           ),
-                                        
+                                          searchable: true,
+                                          title: const Text('Location'),
+                                          searchHint: 'Location...',
+                                          buttonText: const Text('Location'),
+                                        ),
                                       ),
                                     ),
-                                ],
-                              ),
-                            ]
-                          ),
-                        )
-                  ),
-                ],
-              ),
-            )
-          );
+                                  ],
+                                ),
+                              ]),
+                        )),
+                  ],
+                ),
+              ));
   }
-
-
-
-
 }

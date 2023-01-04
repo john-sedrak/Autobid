@@ -25,17 +25,9 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     super.dispose();
   }
 
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    // if (auth.currentUser != null) {
-    //   Navigator.of(context).pushReplacementNamed('/');
-    // }
-  }
-
   void navigateToSignup() {
-    Navigator.of(context).pushReplacementNamed('/login');
+    Navigator.of(context)
+        .pushNamedAndRemoveUntil('/login', (Route<dynamic> route) => false);
   }
 
   @override

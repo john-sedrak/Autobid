@@ -1,7 +1,11 @@
+import 'package:autobid/Classes/Car.dart';
 import 'package:autobid/Custom/CustomAppBar.dart';
+import 'package:autobid/Custom/MainDrawer.dart';
+import 'package:autobid/Utils/utils.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:provider/provider.dart';
 
 import 'ChatsScreen.dart';
 import 'ExploreScreen.dart';
@@ -27,7 +31,7 @@ class _TabControllerScreenState extends State<TabControllerScreen> {
     'Explore',
     'Chats',
     'Listings',
-    'Favorites',
+    'Following',
   ];
 
   int pageIndex = 0;
@@ -45,6 +49,10 @@ class _TabControllerScreenState extends State<TabControllerScreen> {
   @override
   void initState() {
     // TODO: implement initState
+    FirebaseMessaging.instance
+        .getToken()
+        .then((value) => print("token:  $value"));
+
     FirebaseMessaging.onMessageOpenedApp.listen((message) {
       print('opened notification');
 
@@ -61,6 +69,34 @@ class _TabControllerScreenState extends State<TabControllerScreen> {
                 arguments: {'otherChatter': otherChatter});
           }
         });
+      } else if (message.data['screen'] == '/bidRoot') {
+        String carId = message.data['carId'];
+        FirebaseFirestore.instance.doc("Cars/$carId").get().then((value) {
+          Map<String, dynamic> carMap = value.data() as Map<String, dynamic>;
+          Car car = Utils.mapToCar(carId, carMap);
+
+          if (Navigator.canPop(context)) {
+            Navigator.of(context).pushReplacementNamed('/bidRoute',
+                arguments: {'car': car, 'isExpanded': true});
+          } else {
+            Navigator.of(context).pushNamed('/bidRoute',
+                arguments: {'car': car, 'isExpanded': true});
+          }
+        });
+      } else if (message.data['screen'] == "/myListingRoute") {
+        String carId = message.data['carId'];
+        FirebaseFirestore.instance.doc("Cars/$carId").get().then((value) {
+          Map<String, dynamic> carMap = value.data() as Map<String, dynamic>;
+          Car car = Utils.mapToCar(carId, carMap);
+
+          if (Navigator.canPop(context)) {
+            Navigator.of(context).pushReplacementNamed('/myListingRoute',
+                arguments: {'car': car});
+          } else {
+            Navigator.of(context)
+                .pushNamed('/myListingRoute', arguments: {'car': car});
+          }
+        });
       }
     });
     super.initState();
@@ -70,6 +106,7 @@ class _TabControllerScreenState extends State<TabControllerScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(title: labels[pageIndex]),
+      drawer: const MainDrawer(),
       body: pages[pageIndex],
       floatingActionButton: pageIndex == 0 || pageIndex == 2
           ? FloatingActionButton(

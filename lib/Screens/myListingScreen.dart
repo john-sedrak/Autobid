@@ -44,7 +44,7 @@ class _BiddingScreenState extends State<MyListingScreen> {
       });
     });
 
-    Future.delayed(Duration(seconds: 1)).then((value) {
+    Future.delayed(Duration(seconds: 0)).then((value) {
       var carsInstance =
           FirebaseFirestore.instance.collection("Cars").doc(carObj!.id);
       var stream = carsInstance.snapshots();

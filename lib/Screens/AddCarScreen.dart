@@ -20,7 +20,11 @@ class _AddCarScreenState extends State<AddCarScreen> {
   final carsRef = FirebaseFirestore.instance.collection('Cars');
   int _currentStep = 0;
   final detailsKey = GlobalKey<FormState>();
-  List brandController = [];
+  Map<String, Object> brandDateLocation = {
+    "brand": "",
+    "date": DateTime.now(),
+    "location": ""
+  };
   TextEditingController modelController = new TextEditingController();
   TextEditingController yearController = new TextEditingController();
   TextEditingController descriptionController = new TextEditingController();
@@ -29,38 +33,40 @@ class _AddCarScreenState extends State<AddCarScreen> {
 
   List allPictures = [];
   List downloadUrls = [];
-  Future uploadFiles() async {
-    allPictures.forEach((_photo) async {
-      if (_photo == null) return;
-      final fileName = basename(_photo!.path);
+  Future<void> uploadFiles() async {
+    await Future.wait(allPictures.map((photo) async {
+      if (photo == null) return "";
+      final fileName = basename(photo!.path);
       final destination = 'files/$fileName';
 
       try {
         final ref = FirebaseStorage.instance.ref(destination).child('file/');
-        await ref.putFile(_photo!);
+        await ref.putFile(photo!);
         String url = await ref.getDownloadURL();
+        print(url);
         downloadUrls.add(url);
+        return url;
       } catch (e) {
         print('error occured');
       }
-    });
+    }));
   }
 
-  void postCar() async {
-    uploadFiles().then((value) => carsRef.doc().set({
-          'brand': brandController[0],
-          'model': modelController.text,
-          'year': yearController.text,
-          'description': descriptionController.text,
-          'mileage': mileageController.text,
-          'startingPrice': priceController.text,
-          'images': downloadUrls,
-          'validUntil': DateTime.now(),
-          'sellerID': "5Hq5HL1TRdS7iz4Uz7Oi7uQsb5G2",
-          'bidderID': "",
-          'currentBid': 0
-        }));
-    print(downloadUrls);
+  postCar() async {
+    carsRef.doc().set({
+      'brand': brandDateLocation["brand"],
+      'model': modelController.text,
+      'year': yearController.text,
+      'description': descriptionController.text,
+      'mileage': mileageController.text,
+      'startingPrice': priceController.text,
+      'images': downloadUrls,
+      'validUntil': brandDateLocation["date"],
+      'location': brandDateLocation["location"],
+      'sellerID': "5Hq5HL1TRdS7iz4Uz7Oi7uQsb5G2", //HARDCODED
+      'bidderID': "",
+      'currentBid': 0
+    });
   }
 
   _stepState(int step) {
@@ -76,7 +82,7 @@ class _AddCarScreenState extends State<AddCarScreen> {
           title: Text('Details'),
           content: CarDetails(
             formKey: detailsKey,
-            brandController: brandController,
+            brandDateLocation: brandDateLocation,
             modelController: modelController,
             yearController: yearController,
             descriptionController: descriptionController,
@@ -152,9 +158,8 @@ class _AddCarScreenState extends State<AddCarScreen> {
             },
             type: StepperType.horizontal,
             onStepTapped: (step) => setState(() => _currentStep = step),
-            onStepContinue: () {
+            onStepContinue: () async {
               if (_currentStep == 0 && detailsKey.currentState!.validate()) {
-                print(brandController);
                 setState(() {
                   if (_currentStep < _steps().length - 1) {
                     _currentStep += 1;
@@ -163,6 +168,7 @@ class _AddCarScreenState extends State<AddCarScreen> {
                   }
                 });
               } else if (_currentStep == 1 && allPictures.length > 0) {
+                await uploadFiles();
                 postCar();
               }
             },

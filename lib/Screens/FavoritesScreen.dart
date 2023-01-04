@@ -1,10 +1,13 @@
 import 'dart:math';
 import 'package:autobid/Classes/Car.dart';
+import 'package:autobid/Classes/UserModel.dart';
 import 'package:autobid/Custom/FavoriteCard.dart';
+import 'package:autobid/Providers/UserProvider.dart';
 import 'package:autobid/Screens/AuthenticationScreens/errorMessage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:provider/provider.dart';
 
 class FavoritesScreen extends StatefulWidget {
   const FavoritesScreen({super.key});
@@ -14,7 +17,9 @@ class FavoritesScreen extends StatefulWidget {
 }
 
 class _FavoritesScreenState extends State<FavoritesScreen> {
-  String userId = "RoFvf4QhbYY3dybd0nDulXzxLcK2";
+  String userId = FirebaseAuth.instance.currentUser!.uid;
+  // = "RoFvf4QhbYY3dybd0nDulXzxLcK2";
+
   final carsRef = FirebaseFirestore.instance.collection('Cars');
 
   List<Car> favorites = [];
@@ -119,8 +124,6 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
       favorites = newFavs;
       isLoading = false;
     });
-
-    showErrorMessage("No internet");
   }
 
   void removeFromFavorites(int index) {
@@ -142,15 +145,6 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
     // TODO: implement initState
     getFavorites();
     super.initState();
-  }
-
-  void showErrorMessage(String msg) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      backgroundColor: Colors.grey.shade300,
-      elevation: 0,
-      content: Text(msg),
-      behavior: SnackBarBehavior.floating,
-    ));
   }
 
   @override

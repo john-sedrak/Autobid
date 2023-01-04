@@ -1,6 +1,7 @@
 import 'package:autobid/Classes/Car.dart';
-import 'package:autobid/Classes/User.dart' as user;
+import 'package:autobid/Classes/UserModel.dart';
 import 'package:autobid/Custom/CustomAppBar.dart';
+import 'package:autobid/Screens/AuthenticationScreens/errorMessage.dart';
 import 'package:autobid/Utils/utils.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -18,11 +19,10 @@ class _BiddingScreenState extends State<BiddingScreen> {
   int activePage = 0;
   late PageController _pageController;
 
-  String userID = FirebaseAuth.instance.currentUser!.uid;
+  String userID = "RoFvf4QhbYY3dybd0nDulXzxLcK2";
+  UserModel? currentUser;
 
-  user.User? currentUser;
-
-  user.User? seller;
+  UserModel? seller;
 
   var inputController = TextEditingController();
 
@@ -35,6 +35,7 @@ class _BiddingScreenState extends State<BiddingScreen> {
     super.initState();
     addToFavorites();
     //--------------remove when auth-----------------------
+    userID = FirebaseAuth.instance.currentUser!.uid;
     FirebaseFirestore.instance
         .collection('Users')
         .doc(userID)
@@ -53,7 +54,7 @@ class _BiddingScreenState extends State<BiddingScreen> {
     final usersRef = FirebaseFirestore.instance.collection('Users');
     DocumentSnapshot userDoc = await usersRef.doc(userID).get();
     Map<String, dynamic> userMap = userDoc.data() as Map<String, dynamic>;
-    user.User currentUser = Utils.mapToUser(userID, userMap);
+    UserModel currentUser = Utils.mapToUser(userID, userMap);
     // print(currentUser.favorites);
   }
 
@@ -125,8 +126,6 @@ class _BiddingScreenState extends State<BiddingScreen> {
     });
     final docRef =
         FirebaseFirestore.instance.collection('Cars').doc(carObj!.id);
-    // print(carObj!.id);
-//NEED TO NOTIFY OR SEND A PUSH NOTIFICATION TO OLD BIDDER
     Navigator.pop(ctx, 'OK');
     return docRef.update(
         {"currentBid": double.parse(inputController.text), "bidderID": userID});
@@ -150,7 +149,7 @@ class _BiddingScreenState extends State<BiddingScreen> {
     return usersRef.doc(sellerId).get().then((userDoc) {
       sellerSnapshot = userDoc;
       Map<String, dynamic> userMap = userDoc.data() as Map<String, dynamic>;
-      user.User sellerTmp = Utils.mapToUser(sellerId, userMap);
+      UserModel sellerTmp = Utils.mapToUser(sellerId, userMap);
       setState(() {
         seller = sellerTmp;
       });
@@ -193,15 +192,26 @@ class _BiddingScreenState extends State<BiddingScreen> {
           //   child: const Text('OK'),
           // ),
           ElevatedButton(
-            onPressed: () => updateBid(context).then((value) async {
-              inputController.clear();
-              await refreshCar();
-              setState(() {
-                isExpanded = !isExpanded;
-                errorText = null;
-                isLoading = false;
-              });
-            }),
+            onPressed: () => updateBid(context)
+                .then((value) async {
+                  inputController.clear();
+                  await refreshCar();
+                  setState(() {
+                    isExpanded = !isExpanded;
+                    errorText = null;
+                    isLoading = false;
+                  });
+                })
+                .timeout(Duration(seconds: 10))
+                .catchError((errorText) {
+                  showErrorMessage(
+                      "Your bid will be confirmed once you connect to the internet.");
+                  setState(() {
+                    isExpanded = !isExpanded;
+                    errorText = null;
+                    isLoading = false;
+                  });
+                }),
             child: Text(
               " Confirm ",
               style: TextStyle(fontSize: 18),
@@ -219,6 +229,18 @@ class _BiddingScreenState extends State<BiddingScreen> {
     );
   }
 
+  void showErrorMessage(String msg) {
+    Future.delayed(Duration(seconds: 0))
+        .then((_) => ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              backgroundColor: Color.fromARGB(0, 255, 255, 255),
+              elevation: 0,
+              content: errorMessage(
+                message: msg,
+              ),
+              behavior: SnackBarBehavior.fixed,
+            )));
+  }
+
   bool onStart = true;
   @override
   Widget build(BuildContext context) {
@@ -232,9 +254,16 @@ class _BiddingScreenState extends State<BiddingScreen> {
         carObj = car;
         isLoading = true;
       });
-      getSeller(car.sellerID).then((value) => setState(() {
-            isLoading = false;
-          }));
+      try {
+        getSeller(car.sellerID).then((value) => setState(() {
+              isLoading = false;
+            }));
+      } catch (e) {
+        showErrorMessage("Connection Error! Could not load Content.");
+        setState(() {
+          isLoading = false;
+        });
+      }
     } else {
       car = carObj!;
     }

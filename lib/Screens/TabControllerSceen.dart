@@ -1,9 +1,11 @@
 import 'package:autobid/Classes/Car.dart';
 import 'package:autobid/Custom/CustomAppBar.dart';
+import 'package:autobid/Providers/UserProvider.dart';
 import 'package:autobid/Utils/utils.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:provider/provider.dart';
 
 import 'ChatsScreen.dart';
 import 'ExploreScreen.dart';
@@ -72,8 +74,14 @@ class _TabControllerScreenState extends State<TabControllerScreen> {
         FirebaseFirestore.instance.doc("Cars/$carId").get().then((value) {
           Map<String, dynamic> carMap = value.data() as Map<String, dynamic>;
           Car car = Utils.mapToCar(carId, carMap);
-          Navigator.of(context).pushNamed('/bidRoute',
-              arguments: {'car': car, 'isExpanded': true});
+
+          if (Navigator.canPop(context)) {
+            Navigator.of(context).pushReplacementNamed('/bidRoute',
+                arguments: {'car': car, 'isExpanded': true});
+          } else {
+            Navigator.of(context).pushNamed('/bidRoute',
+                arguments: {'car': car, 'isExpanded': true});
+          }
         });
       }
     });
@@ -114,6 +122,7 @@ class _TabControllerScreenState extends State<TabControllerScreen> {
         currentIndex: pageIndex,
         onTap: pageSelect,
       ),
+      resizeToAvoidBottomInset: false,
     );
   }
 }

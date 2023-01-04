@@ -30,7 +30,9 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     // TODO: implement initState
     super.initState();
     if (auth.currentUser != null) {
-      Navigator.of(context).pushReplacementNamed('/');
+      Future.delayed(Duration(seconds: 0)).then((_) {
+        Navigator.of(context).pop();
+      });
     }
   }
 

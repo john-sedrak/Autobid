@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:autobid/Screens/ChatsScreen.dart';
 import 'package:autobid/Utilities/TimeManager.dart';
+import 'package:autobid/Utils/utils.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
@@ -21,18 +22,20 @@ class _MessagesScreenState extends State<MessagesScreen> {
   DocumentReference<Map<String, dynamic>> userRef =
       FirebaseFirestore.instance.doc('Users/' + 'RoFvf4QhbYY3dybd0nDulXzxLcK2');
 
-  Future<DocumentSnapshot<Map<String, dynamic>>> createAndRetrieveChat(DocumentSnapshot otherChatter) async {
+  Future<DocumentSnapshot<Map<String, dynamic>>> createAndRetrieveChat(
+      DocumentSnapshot otherChatter) async {
     var myFetchedChats = await FirebaseFirestore.instance
         .collection('Chats')
         .where('chatters', arrayContains: userRef)
         .get();
-    
+
     if (myFetchedChats.docs.isNotEmpty) {
       var chatIterator = myFetchedChats.docs.iterator;
 
-      while(chatIterator.moveNext()){
+      while (chatIterator.moveNext()) {
         var fetchedChat = chatIterator.current;
-        if ((fetchedChat.data()['chatters'] as List).contains(otherChatter.reference)){
+        if ((fetchedChat.data()['chatters'] as List)
+            .contains(otherChatter.reference)) {
           print('hello');
           return fetchedChat;
         }
@@ -53,6 +56,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
     // TODO: implement initState
     super.initState();
   }
+
   @override
   Widget build(BuildContext context) {
     var colorScheme = Theme.of(context).colorScheme;
@@ -61,10 +65,9 @@ class _MessagesScreenState extends State<MessagesScreen> {
         ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
 
     late DocumentSnapshot otherChatter;
-    if(routeArgs['otherChatter'] != null){
+    if (routeArgs['otherChatter'] != null) {
       otherChatter = routeArgs['otherChatter'] as DocumentSnapshot;
-    }
-    else{
+    } else {
       String otherChatterRef = routeArgs['otherChatterRef'];
       FirebaseFirestore.instance.doc(otherChatterRef).get().then((value) {
         setState(() {
@@ -72,7 +75,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
         });
       });
     }
-    
+
     Stream<QuerySnapshot<Map<String, dynamic>>> textStream;
     late DocumentSnapshot<Map<String, dynamic>> chatSnapshot;
 
@@ -86,19 +89,17 @@ class _MessagesScreenState extends State<MessagesScreen> {
           .snapshots();
       setState(() {
         _messagesFetched = true;
-        
       });
     } else {
-
       textStream = const Stream<QuerySnapshot<Map<String, dynamic>>>.empty();
-      
-      if(routeArgs['otherChatter'] != null){  
+
+      if (routeArgs['otherChatter'] != null) {
         createAndRetrieveChat(otherChatter).then((value) {
           chatSnapshot = value;
           textStream = chatSnapshot.reference
-            .collection('Texts')
-            .orderBy('timestamp', descending: true)
-            .snapshots();
+              .collection('Texts')
+              .orderBy('timestamp', descending: true)
+              .snapshots();
           setState(() {
             _messagesFetched = true;
             routeArgs['chatSnapshot'] = chatSnapshot;
@@ -179,27 +180,37 @@ class _MessagesScreenState extends State<MessagesScreen> {
     }
 
     void sendMessage() {
-      
-      if(messageController.text.trim().isNotEmpty){
+      if (messageController.text.trim().isNotEmpty) {
         chatSnapshot.reference.collection('Texts').doc().set({
           'content': messageController.text,
-          'receiver': userRef,
-          'sender': otherChatter.reference,
+          'sender': userRef,
+          'receiver': otherChatter.reference,
           'timestamp': Timestamp.now()
         });
         setState(() {
           messageController.clear();
-          
         });
       }
     }
 
-    if(_error){
-      return Center(child: Text("An Error has occured"),);
+    if (_error) {
+      return Center(
+        child: Text("An Error has occured"),
+      );
     }
     return Scaffold(
       appBar: AppBar(
-        title: routeArgs['otherChatter'] == null?CircularProgressIndicator(color: colorScheme.secondary,):Text(otherChatter['name']),
+        title: routeArgs['otherChatter'] == null
+            ? CircularProgressIndicator(
+                color: colorScheme.secondary,
+              )
+            : Text(otherChatter['name']),
+        actions: [
+          IconButton(
+              onPressed: () =>
+                  Utils.dialPhoneNumber(otherChatter.get('phoneNumber')),
+              icon: Icon(Icons.phone))
+        ],
       ),
       body: Column(
         children: [
@@ -262,22 +273,21 @@ class _MessagesScreenState extends State<MessagesScreen> {
                         TextStyle(color: colorScheme.onPrimary, fontSize: 16),
                     border: InputBorder.none),
               )),
-              _messagesFetched && routeArgs['otherChatter'] != null?
-              ElevatedButton(
-                onPressed: sendMessage,
-                style: ElevatedButton.styleFrom(
-                    backgroundColor: colorScheme.secondary,
-                    foregroundColor: colorScheme.onSecondary),
-                child: const Icon(Icons.send),
-              )
-              :
-              ElevatedButton(
-                onPressed: null,
-                style: ElevatedButton.styleFrom(
-                    backgroundColor:colorScheme.background,
-                    foregroundColor: colorScheme.onSecondary),
-                child: const Icon(Icons.cancel_schedule_send),
-              )
+              _messagesFetched && routeArgs['otherChatter'] != null
+                  ? ElevatedButton(
+                      onPressed: sendMessage,
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor: colorScheme.secondary,
+                          foregroundColor: colorScheme.onSecondary),
+                      child: const Icon(Icons.send),
+                    )
+                  : ElevatedButton(
+                      onPressed: null,
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor: colorScheme.background,
+                          foregroundColor: colorScheme.onSecondary),
+                      child: const Icon(Icons.cancel_schedule_send),
+                    )
             ]),
           )
         ],

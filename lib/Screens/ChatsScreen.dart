@@ -28,7 +28,8 @@ class _ChatsScreenState extends State<ChatsScreen> {
             .get('name')
             .toString()
             .toLowerCase()
-            .startsWith(input.toLowerCase())) {
+            .split(' ')
+            .any((element) => element.startsWith(input.toLowerCase()))) {
           searchResults.add(element);
         }
       }).catchError((e) {

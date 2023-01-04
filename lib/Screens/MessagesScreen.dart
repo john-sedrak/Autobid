@@ -183,8 +183,8 @@ class _MessagesScreenState extends State<MessagesScreen> {
       if(messageController.text.trim().isNotEmpty){
         chatSnapshot.reference.collection('Texts').doc().set({
           'content': messageController.text,
-          'receiver': userRef,
-          'sender': otherChatter.reference,
+          'sender': userRef,
+          'receiver': otherChatter.reference,
           'timestamp': Timestamp.now()
         });
         setState(() {

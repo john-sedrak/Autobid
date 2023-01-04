@@ -26,10 +26,11 @@ class _AddCarScreenState extends State<AddCarScreen> {
   final detailsKey = GlobalKey<FormState>();
   Map<String, Object> brandDateLocation = {
     "brand": "",
-    "date": DateTime.now(),
+    "model": "",
+    "date": "",
     "location": ""
   };
-  TextEditingController modelController = new TextEditingController();
+  //TextEditingController modelController = new TextEditingController();
   TextEditingController yearController = new TextEditingController();
   TextEditingController descriptionController = new TextEditingController();
   TextEditingController mileageController = new TextEditingController();
@@ -60,7 +61,7 @@ class _AddCarScreenState extends State<AddCarScreen> {
     final User? user = await auth.currentUser;
     carsRef.doc().set({
       'brand': brandDateLocation["brand"],
-      'model': modelController.text,
+      'model': brandDateLocation["model"],
       'year': yearController.text,
       'description': descriptionController.text,
       'mileage': mileageController.text,
@@ -88,7 +89,7 @@ class _AddCarScreenState extends State<AddCarScreen> {
           content: CarDetails(
             formKey: detailsKey,
             brandDateLocation: brandDateLocation,
-            modelController: modelController,
+            //  modelController: modelController,
             yearController: yearController,
             descriptionController: descriptionController,
             mileageController: mileageController,
@@ -186,7 +187,8 @@ class _AddCarScreenState extends State<AddCarScreen> {
                 });
               } else if (_currentStep == 1 && allPictures.length > 0) {
                 await uploadFiles();
-                postCar();
+                await postCar();
+                Navigator.of(context).pop();
               } else if (_currentStep == 1 && !(allPictures.length > 0)) {
                 showErrorMessage("Add at least one image of the car.");
               }

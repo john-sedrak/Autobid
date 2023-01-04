@@ -211,28 +211,26 @@ class _BiddingScreenState extends State<BiddingScreen> {
             double.parse(inputController.text).toString() +
             ' EGP bid for this listing?'),
         actions: <Widget>[
-          ElevatedButton(
-            onPressed: () {
-              inputController.clear();
-              setState(() {
-                isExpanded = !isExpanded;
-                errorText = null;
-              });
-              Navigator.pop(context, 'Cancel');
-            },
-            child: Text(
-              "  Cancel  ",
-              style: TextStyle(fontSize: 18),
-            ),
-            style: ButtonStyle(
-                backgroundColor:
-                    MaterialStateProperty.all(Colors.redAccent.shade700),
-                foregroundColor: MaterialStateProperty.all(Colors.white),
-                shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                    RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(15.0),
-                        side: BorderSide(color: Colors.redAccent.shade700)))),
-          ),
+          OutlinedButton(
+              style: ButtonStyle(
+                  side:
+                      MaterialStateProperty.all(BorderSide(color: Colors.pink)),
+                  shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                      RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15.0),
+                  ))),
+              onPressed: () {
+                inputController.clear();
+                setState(() {
+                  isExpanded = !isExpanded;
+                  errorText = null;
+                });
+                Navigator.pop(context, 'Cancel');
+              },
+              child: Text(
+                "  Cancel  ",
+                style: TextStyle(fontSize: 18, color: Colors.pink),
+              )),
           // TextButton(
           //   onPressed: () => Navigator.pop(context, 'OK'),
           //   child: const Text('OK'),
@@ -597,6 +595,7 @@ class _BiddingScreenState extends State<BiddingScreen> {
                                               ),
                                             ),
                                             TextField(
+                                              cursorColor: Colors.pink,
                                               decoration: InputDecoration(
                                                   floatingLabelStyle: TextStyle(
                                                       color: errorText == null
@@ -626,7 +625,21 @@ class _BiddingScreenState extends State<BiddingScreen> {
                                                     MainAxisAlignment
                                                         .spaceAround,
                                                 children: [
-                                                  ElevatedButton(
+                                                  OutlinedButton(
+                                                    style: ButtonStyle(
+                                                        side:
+                                                            MaterialStateProperty
+                                                                .all(BorderSide(
+                                                                    color: Colors
+                                                                        .pink)),
+                                                        shape: MaterialStateProperty.all<
+                                                                RoundedRectangleBorder>(
+                                                            RoundedRectangleBorder(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(
+                                                                      15.0),
+                                                        ))),
                                                     onPressed: () {
                                                       inputController.clear();
                                                       setState(() {
@@ -638,22 +651,9 @@ class _BiddingScreenState extends State<BiddingScreen> {
                                                     child: Text(
                                                       "  Cancel  ",
                                                       style: TextStyle(
-                                                          fontSize: 18),
+                                                          fontSize: 18,
+                                                          color: Colors.pink),
                                                     ),
-                                                    style: ButtonStyle(
-                                                        backgroundColor:
-                                                            MaterialStateProperty.all(
-                                                                Colors.redAccent
-                                                                    .shade700),
-                                                        foregroundColor:
-                                                            MaterialStateProperty.all(
-                                                                Colors.white),
-                                                        shape: MaterialStateProperty.all<
-                                                                RoundedRectangleBorder>(
-                                                            RoundedRectangleBorder(
-                                                                borderRadius:
-                                                                    BorderRadius.circular(15.0),
-                                                                side: BorderSide(color: Colors.redAccent.shade700)))),
                                                   ),
                                                   ElevatedButton(
                                                     onPressed: errorText !=

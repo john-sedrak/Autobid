@@ -26,7 +26,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
   List favoriteIds = [];
   int loaded = 0;
 
-  int pageSize = 3;
+  int pageSize = 8;
 
   bool isLoading = false;
 

@@ -146,8 +146,9 @@ class _BiddingScreenState extends State<MyListingScreen> {
             )));
   }
 
-  bool onStart = true;
+  void goToEditPage() {}
 
+  bool onStart = true;
   bool noBidder = false;
   @override
   Widget build(BuildContext context) {
@@ -189,6 +190,11 @@ class _BiddingScreenState extends State<MyListingScreen> {
 
     return Scaffold(
         appBar: CustomAppBar(title: "Car Details"),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () => goToEditPage(),
+          backgroundColor: Colors.pink,
+          child: const Icon(Icons.edit),
+        ),
         body: isLoading
             ? Center(
                 child: CircularProgressIndicator(

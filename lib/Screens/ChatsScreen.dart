@@ -12,8 +12,8 @@ class ChatsScreen extends StatefulWidget {
 
 class _ChatsScreenState extends State<ChatsScreen> {
   var searchController = TextEditingController();
-  var searchResults = <Map<String, dynamic>>[];
-  var chatMaps = <Map<String, dynamic>>[];
+  var searchResults = <ChatTile>[];
+  var chatMaps = <ChatTile>[];
   bool _error = false;
   DocumentReference<Map<String, dynamic>> userRef =
       FirebaseFirestore.instance.doc('Users/RoFvf4QhbYY3dybd0nDulXzxLcK2');
@@ -22,7 +22,7 @@ class _ChatsScreenState extends State<ChatsScreen> {
     searchResults.clear();
 
     for (var element in chatMaps) {
-      (element['otherChatter']as Future).then((otherChatter) {
+      element.otherChatterFuture.then((otherChatter) {
         if (otherChatter
             .get('name')
             .toString()
@@ -30,12 +30,11 @@ class _ChatsScreenState extends State<ChatsScreen> {
             .startsWith(input.toLowerCase())) {
           searchResults.add(element);
         }
-      }).catchError((e){
+      }).catchError((e) {
         setState(() {
           _error = true;
         });
       });
-      
     }
     setState(() {});
   }
@@ -55,14 +54,11 @@ class _ChatsScreenState extends State<ChatsScreen> {
     if (chatMaps.isEmpty) {
       for (int i = 0; i < chats.length; i++) {
         var element = chats[i];
-        var map = <String, dynamic>{};
-        map['chatSnapshot'] = element;
-        map['otherChatter'] = getChatterFuture(element);
-        map['chatTile'] = ChatTile(
+
+        chatMaps.add(ChatTile(
             key: ValueKey(i),
-            chatSnapshot: map['chatSnapshot'],
-            otherChatterFuture: map['otherChatter']);
-        chatMaps.add(map);
+            chatSnapshot: element,
+            otherChatterFuture: getChatterFuture(element)));
       }
     }
     if (searchController.text.trim().isEmpty) {
@@ -108,17 +104,17 @@ class _ChatsScreenState extends State<ChatsScreen> {
                   onChanged: onSearchChanged,
                 ),
               ),
-              if(searchController.text.isNotEmpty)
-              IconButton(
-                splashRadius: 1,
-                  onPressed: () {
-                    searchController.clear();
-                    onSearchChanged("");
-                  },
-                  icon:const  Icon(
-                    Icons.cancel,
-                    color: Colors.grey,
-                  ))
+              if (searchController.text.isNotEmpty)
+                IconButton(
+                    splashRadius: 1,
+                    onPressed: () {
+                      searchController.clear();
+                      onSearchChanged("");
+                    },
+                    icon: const Icon(
+                      Icons.cancel,
+                      color: Colors.grey,
+                    ))
             ],
           ),
         ),
@@ -133,7 +129,7 @@ class _ChatsScreenState extends State<ChatsScreen> {
                     populateResultLists(chats);
                     return ListView.builder(
                       itemBuilder: (context, index) {
-                        return searchResults[index]['chatTile'];
+                        return searchResults[index];
                       },
                       itemCount: searchResults.length,
                     );

@@ -239,7 +239,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   width: 270,
                                   child: ElevatedButton(
                                     style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.pink.shade300,
+                                        backgroundColor: Colors.pink,
                                         shape: RoundedRectangleBorder(
                                           borderRadius:
                                               BorderRadius.circular(30),
@@ -251,7 +251,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                           ? "Sign Up"
                                           : "Login",
                                       style: TextStyle(
-                                          color: Colors.grey.shade300),
+                                          color: Colors.white),
                                     ),
                                   ),
                                 ),

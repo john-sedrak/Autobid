@@ -20,14 +20,12 @@ class _MessagesScreenState extends State<MessagesScreen> {
 
   bool _error = false;
 
-<<<<<<< HEAD
-=======
   late DocumentReference chatRef;
->>>>>>> edf41cf2c47cac17ba1b1341ac6b8985cf5aedc6
   DocumentReference<Map<String, dynamic>> userRef = FirebaseFirestore.instance
       .doc('Users/${FirebaseAuth.instance.currentUser!.uid}');
 
-  Future<DocumentSnapshot<Map<String, dynamic>>> createOrRetrieveChat(DocumentSnapshot otherChatter) async {
+  Future<DocumentSnapshot<Map<String, dynamic>>> createOrRetrieveChat(
+      DocumentSnapshot otherChatter) async {
     // RETRIEVING
     var myFetchedChats = await FirebaseFirestore.instance
         .collection('Chats')

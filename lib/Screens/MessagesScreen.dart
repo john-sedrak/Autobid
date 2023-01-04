@@ -20,11 +20,12 @@ class _MessagesScreenState extends State<MessagesScreen> {
 
   bool _error = false;
 
-  DocumentReference<Map<String, dynamic>> userRef =
-      FirebaseFirestore.instance.doc('Users/${FirebaseAuth.instance.currentUser!.uid}');
+  late DocumentReference chatRef;
+  DocumentReference<Map<String, dynamic>> userRef = FirebaseFirestore.instance
+      .doc('Users/${FirebaseAuth.instance.currentUser!.uid}');
 
-  Future<DocumentSnapshot<Map<String, dynamic>>> createAndRetrieveChat(
-      DocumentSnapshot otherChatter) async {
+  Future<DocumentSnapshot<Map<String, dynamic>>> createOrRetrieveChat(DocumentSnapshot otherChatter) async {
+    // RETRIEVING
     var myFetchedChats = await FirebaseFirestore.instance
         .collection('Chats')
         .where('chatters', arrayContains: userRef)
@@ -37,19 +38,27 @@ class _MessagesScreenState extends State<MessagesScreen> {
         var fetchedChat = chatIterator.current;
         if ((fetchedChat.data()['chatters'] as List)
             .contains(otherChatter.reference)) {
-          print('hello');
           return fetchedChat;
         }
       }
     }
-
+    // CREATING
     var newChatRef = FirebaseFirestore.instance.collection('Chats').doc();
     await newChatRef.set({
-      'chatters': [otherChatter.reference, userRef]
+      'chatters': [otherChatter.reference, userRef],
+      'unread': {otherChatter.id: 0, userRef.id: 0},
     });
     var createdChat = await newChatRef.get();
 
     return createdChat;
+  }
+
+  @override
+  void dispose() {
+    print('disposing');
+
+    chatRef.update({'unread.${userRef.id}': 0});
+    super.dispose();
   }
 
   @override
@@ -65,7 +74,10 @@ class _MessagesScreenState extends State<MessagesScreen> {
     var routeArgs =
         ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
 
+    Stream<QuerySnapshot<Map<String, dynamic>>> textStream;
+    late DocumentSnapshot<Map<String, dynamic>> chatSnapshot;
     late DocumentSnapshot otherChatter;
+
     if (routeArgs['otherChatter'] != null) {
       otherChatter = routeArgs['otherChatter'] as DocumentSnapshot;
     } else {
@@ -77,26 +89,25 @@ class _MessagesScreenState extends State<MessagesScreen> {
       });
     }
 
-    Stream<QuerySnapshot<Map<String, dynamic>>> textStream;
-    late DocumentSnapshot<Map<String, dynamic>> chatSnapshot;
-
     if (routeArgs['chatSnapshot'] != null) {
-      print("didn't enter else");
       chatSnapshot =
           routeArgs['chatSnapshot'] as DocumentSnapshot<Map<String, dynamic>>;
+      chatRef = chatSnapshot.reference;
       textStream = chatSnapshot.reference
           .collection('Texts')
           .orderBy('timestamp', descending: true)
           .snapshots();
       setState(() {
         _messagesFetched = true;
+        chatRef = chatSnapshot.reference;
       });
     } else {
       textStream = const Stream<QuerySnapshot<Map<String, dynamic>>>.empty();
 
       if (routeArgs['otherChatter'] != null) {
-        createAndRetrieveChat(otherChatter).then((value) {
+        createOrRetrieveChat(otherChatter).then((value) {
           chatSnapshot = value;
+          chatRef = chatSnapshot.reference;
           textStream = chatSnapshot.reference
               .collection('Texts')
               .orderBy('timestamp', descending: true)
@@ -188,6 +199,8 @@ class _MessagesScreenState extends State<MessagesScreen> {
           'receiver': otherChatter.reference,
           'timestamp': Timestamp.now()
         });
+        chatSnapshot.reference
+            .update({"unread.${otherChatter.id}": FieldValue.increment(1)});
         setState(() {
           messageController.clear();
         });

@@ -102,6 +102,6 @@ class _MyAppState extends State<MyApp> {
                   '/messages': (context) => MessagesScreen(),
                 }),
           )
-        : Container(color: Colors.green.shade300,);
+        : Container(color: Colors.grey.shade300,);
   }
 }

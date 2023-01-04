@@ -54,6 +54,8 @@ class _BiddingScreenState extends State<MyListingScreen> {
           carObj = Utils.mapToCar(carObj!.id, carMap);
         });
       });
+    }).catchError((e) {
+      showErrorMessage("Error! Cannot load car data!");
     });
     //---------------------------------------------------------
     _pageController = PageController(viewportFraction: 1, initialPage: 0);
@@ -288,11 +290,29 @@ class _BiddingScreenState extends State<MyListingScreen> {
                           child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  car.brand,
-                                  style: TextStyle(
-                                      fontSize: 32,
-                                      fontWeight: FontWeight.bold),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      car.brand,
+                                      style: TextStyle(
+                                          fontSize: 32,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      children: [
+                                        Icon(Icons.location_pin,
+                                            color: Colors.blueGrey),
+                                        Text(
+                                          car.location,
+                                          style:
+                                              TextStyle(color: Colors.blueGrey),
+                                        )
+                                      ],
+                                    )
+                                  ],
                                 ),
                                 Text(
                                   "${car.model}, ${car.year}",

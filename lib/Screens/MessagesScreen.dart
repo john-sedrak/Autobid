@@ -2,7 +2,9 @@ import 'dart:async';
 
 import 'package:autobid/Screens/ChatsScreen.dart';
 import 'package:autobid/Utilities/TimeManager.dart';
+import 'package:autobid/Utils/utils.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class MessagesScreen extends StatefulWidget {
@@ -18,8 +20,8 @@ class _MessagesScreenState extends State<MessagesScreen> {
 
   bool _error = false;
 
-  DocumentReference<Map<String, dynamic>> userRef =
-      FirebaseFirestore.instance.doc('Users/' + 'RoFvf4QhbYY3dybd0nDulXzxLcK2');
+  DocumentReference<Map<String, dynamic>> userRef = FirebaseFirestore.instance
+      .doc('Users/${FirebaseAuth.instance.currentUser!.uid}');
 
   Future<DocumentSnapshot<Map<String, dynamic>>> createAndRetrieveChat(
       DocumentSnapshot otherChatter) async {
@@ -182,8 +184,8 @@ class _MessagesScreenState extends State<MessagesScreen> {
       if (messageController.text.trim().isNotEmpty) {
         chatSnapshot.reference.collection('Texts').doc().set({
           'content': messageController.text,
-          'receiver': userRef,
-          'sender': otherChatter.reference,
+          'sender': userRef,
+          'receiver': otherChatter.reference,
           'timestamp': Timestamp.now()
         });
         setState(() {
@@ -204,6 +206,12 @@ class _MessagesScreenState extends State<MessagesScreen> {
                 color: colorScheme.secondary,
               )
             : Text(otherChatter['name']),
+        actions: [
+          IconButton(
+              onPressed: () =>
+                  Utils.dialPhoneNumber(otherChatter.get('phoneNumber')),
+              icon: Icon(Icons.phone))
+        ],
       ),
       body: Column(
         children: [

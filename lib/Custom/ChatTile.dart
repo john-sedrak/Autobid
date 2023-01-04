@@ -1,10 +1,12 @@
 import 'package:autobid/Utilities/TimeManager.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class ChatTile extends StatefulWidget {
   final QueryDocumentSnapshot<Map<String, dynamic>> chatSnapshot;
-  const ChatTile({super.key, required this.chatSnapshot});
+  final Future<DocumentSnapshot<Map<String, dynamic>>> otherChatterFuture;
+  const ChatTile({super.key, required this.chatSnapshot, required this.otherChatterFuture});
 
   @override
   State<ChatTile> createState() => _ChatTileState();
@@ -15,27 +17,9 @@ class _ChatTileState extends State<ChatTile> {
   bool _latestTextFetched = false;
   bool _error = false;
   DocumentReference<Map<String, dynamic>> userRef =
-      FirebaseFirestore.instance.doc('Users/' + 'RoFvf4QhbYY3dybd0nDulXzxLcK2');
+      FirebaseFirestore.instance.doc('Users/${FirebaseAuth.instance.currentUser!.uid}');
   late DocumentSnapshot<Map<String, dynamic>> otherChatter;
   late Map<String, dynamic> latestText;
-
-  void getChatterName() async {
-    var chat = widget.chatSnapshot.data();
-    try {
-      List chatters = chat['chatters'];
-      int otherChatterIndex =
-          chatters.indexWhere((element) => element != userRef);
-      otherChatter = await chatters[otherChatterIndex].get();
-      setState(() {
-        _chatterFetched = true;
-      });
-    } catch (e) {
-      setState(() {
-        _error = true;
-      });
-      print(e);
-    }
-  }
 
   void navigateToChat() {
     // Future.delayed(Duration(milliseconds: 500), (){
@@ -49,7 +33,16 @@ class _ChatTileState extends State<ChatTile> {
   @override
   void initState() {
     // TODO: implement initState
-    getChatterName();
+    widget.otherChatterFuture.then((value){
+      setState(() {
+        otherChatter = value;
+        _chatterFetched = true;
+      });
+    }).catchError((error) {
+      setState(() {
+        _error = true;
+      });
+    });
     widget.chatSnapshot.reference.collection('Texts').snapshots().listen(
       (event) {
         if(mounted){

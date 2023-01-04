@@ -9,7 +9,12 @@ class FavoriteCard extends StatefulWidget {
   Car car;
 
   bool sellerCard;
-  FavoriteCard({super.key, required this.car, this.sellerCard = false});
+  bool isHighestBidder;
+  FavoriteCard(
+      {super.key,
+      required this.car,
+      this.sellerCard = false,
+      this.isHighestBidder = false});
 
   @override
   State<FavoriteCard> createState() => _FavoriteCardState();
@@ -33,6 +38,8 @@ class _FavoriteCardState extends State<FavoriteCard> {
 
   @override
   Widget build(BuildContext context) {
+    bool bidExpired = DateTime.now().isAfter(widget.car.validUntil);
+
     return InkWell(
         onTap: () => goToBiddingScreen(context),
         child: SizedBox(
@@ -123,28 +130,62 @@ class _FavoriteCardState extends State<FavoriteCard> {
                                   Expanded(
                                     flex: 8,
                                     child: OutlinedButton(
-                                      onPressed: () {
-                                        goToBiddingScreen(context,
-                                            isExpanded: true);
-                                      },
-                                      style: ButtonStyle(
-                                        foregroundColor:
-                                            MaterialStateProperty.all(
-                                                Colors.pink),
-                                        overlayColor: MaterialStateProperty.all(
-                                            Colors.pink.shade200),
-                                        side: MaterialStateProperty.all(
-                                            const BorderSide(
-                                                width: 1, color: Colors.pink)),
+                                      onPressed:
+                                          widget.isHighestBidder || bidExpired
+                                              ? null
+                                              : () {
+                                                  goToBiddingScreen(context,
+                                                      isExpanded: true);
+                                                },
+                                      style: widget.isHighestBidder ||
+                                              bidExpired
+                                          ? ButtonStyle(
+                                              foregroundColor:
+                                                  MaterialStateProperty.all(
+                                                      Color.fromARGB(
+                                                          255, 65, 23, 37)),
+                                              overlayColor:
+                                                  MaterialStateProperty.all(
+                                                      Color.fromARGB(
+                                                          255, 65, 23, 37)),
+                                              side: MaterialStateProperty.all(
+                                                  const BorderSide(
+                                                      width: 1,
+                                                      color: Color.fromARGB(
+                                                          255, 65, 23, 37))))
+                                          : ButtonStyle(
+                                              foregroundColor:
+                                                  MaterialStateProperty.all(
+                                                      Colors.pink),
+                                              overlayColor:
+                                                  MaterialStateProperty.all(
+                                                      Colors.pink.shade200),
+                                              side: MaterialStateProperty.all(
+                                                  const BorderSide(
+                                                      width: 1,
+                                                      color: Colors.pink)),
 
-                                        // side: MaterialStateProperty.all(
-                                        //     Colors.pink),
-                                      ),
-                                      child: const Text(
-                                        "Bid",
-                                        style: TextStyle(
-                                            fontSize: 16, color: Colors.pink),
-                                      ),
+                                              // side: MaterialStateProperty.all(
+                                              //     Colors.pink),
+                                            ),
+                                      child: widget.isHighestBidder
+                                          ? const Text("Your Bid",
+                                              style: TextStyle(
+                                                  fontSize: 16,
+                                                  color: Color.fromARGB(
+                                                      255, 65, 23, 37)))
+                                          : bidExpired
+                                              ? const Text("Bidding is over!",
+                                                  style: TextStyle(
+                                                      fontSize: 16,
+                                                      color: Color.fromARGB(
+                                                          255, 65, 23, 37)))
+                                              : const Text(
+                                                  "Bid",
+                                                  style: TextStyle(
+                                                      fontSize: 16,
+                                                      color: Colors.pink),
+                                                ),
                                     ),
                                   ),
                                 ],

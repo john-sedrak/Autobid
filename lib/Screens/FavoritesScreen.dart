@@ -18,7 +18,6 @@ class FavoritesScreen extends StatefulWidget {
 
 class _FavoritesScreenState extends State<FavoritesScreen> {
   String userId = FirebaseAuth.instance.currentUser!.uid;
-  // = "RoFvf4QhbYY3dybd0nDulXzxLcK2";
 
   final carsRef = FirebaseFirestore.instance.collection('Cars');
 
@@ -71,20 +70,42 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
         addAllFavoriteIds(favs);
 
         List<Car> newFavs = [];
+        List<dynamic> newFavIds = List<dynamic>.from(favoriteIds);
+
         for (int i = 0; i < min(pageSize, favoriteIds.length); i++) {
           var fav = favoriteIds[i];
-          DocumentSnapshot carDoc = await carsRef.doc(fav).get();
-          Map<String, dynamic> carMap = carDoc.data() as Map<String, dynamic>;
-          Car car = mapToCar(fav, carMap);
-          newFavs.add(car);
-          loaded++;
+          try {
+            DocumentSnapshot carDoc = await carsRef.doc(fav).get();
+            Map<String, dynamic> carMap = carDoc.data() as Map<String, dynamic>;
+            Car car = mapToCar(fav, carMap);
+            newFavs.add(car);
+            loaded++;
+          } catch (e) {
+            if (e.toString() ==
+                "type 'Null' is not a subtype of type 'Map<String, dynamic>' in type cast") {
+              newFavIds.removeAt(i);
+            }
+            loaded++;
+          }
         }
+
+        if (favoriteIds.length != newFavIds.length) {
+          final docRef =
+              FirebaseFirestore.instance.collection('Users').doc(userId);
+          docRef.update({"favorites": newFavIds}).then((value) {
+            getFavorites();
+          });
+        } else {
+          setState(() {
+            isLoading = false;
+          });
+        }
+
         setState(() {
           favorites = newFavs;
-          isLoading = false;
+          favoriteIds = newFavIds;
         });
       },
-      onError: (e) => print("Error getting document: $e"),
     );
   }
 
@@ -104,25 +125,44 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
     });
 
     List<Car> newFavs = favorites;
-
+    List<dynamic> newFavIds = List<dynamic>.from(favoriteIds);
     for (int i = loaded; i < min(loaded + pageSize, favoriteIds.length); i++) {
       String fav = favoriteIds[i];
-
-      DocumentSnapshot carDoc = await carsRef.doc(fav).get();
-      if (carDoc.data() == null) {
-        setState(() {
-          isLoading = false;
-        });
-        return;
+      try {
+        DocumentSnapshot carDoc = await carsRef.doc(fav).get();
+        Map<String, dynamic> carMap = carDoc.data() as Map<String, dynamic>;
+        Car car = mapToCar(fav, carMap);
+        newFavs.add(car);
+        loaded++;
+      } catch (e) {
+        if (e.toString() ==
+            "type 'Null' is not a subtype of type 'Map<String, dynamic>' in type cast") {
+          newFavIds.removeAt(i);
+        }
+        loaded++;
       }
-      Map<String, dynamic> carMap = carDoc.data() as Map<String, dynamic>;
-      Car car = mapToCar(fav, carMap);
-      newFavs.add(car);
-      loaded++;
+
+      if (favoriteIds.length != newFavIds.length) {
+        final docRef =
+            FirebaseFirestore.instance.collection('Users').doc(userId);
+        docRef.update({"favorites": newFavIds}).then((value) {});
+      }
+      // DocumentSnapshot carDoc = await carsRef.doc(fav).get();
+      // if (carDoc.data() == null) {
+      //   setState(() {
+      //     isLoading = false;
+      //   });
+      //   return;
+      // }
+      // Map<String, dynamic> carMap = carDoc.data() as Map<String, dynamic>;
+      // Car car = mapToCar(fav, carMap);
+      // newFavs.add(car);
+      // loaded++;
     }
     setState(() {
       favorites = newFavs;
       isLoading = false;
+      favoriteIds = newFavIds;
     });
   }
 
@@ -152,58 +192,77 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
     return isLoading && favorites.isEmpty
         ? Center(
             child: CircularProgressIndicator(
-            color: Colors.pink,
+            color: Color(0xFFE91E62),
           ))
-        : Container(
-            child: RefreshIndicator(
-            color: Colors.pink,
-            onRefresh: () {
-              return Future(getFavorites);
-            },
-            child: ListView.builder(
-                itemCount: favorites.length,
-                itemBuilder: (context, index) => Column(
-                      children: [
-                        Dismissible(
-                          key: Key(favoriteIds[index]),
-                          direction: DismissDirection.endToStart,
-                          onDismissed: (direction) =>
-                              removeFromFavorites(index),
-                          background: Container(
-                              color: Colors.red,
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Padding(
-                                    padding: EdgeInsets.all(10.0),
-                                    child: Text(
-                                      "Remove From\n Favorites",
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                  ),
-                                ],
-                              )),
-                          child: FavoriteCard(
-                            car: favorites[index],
-                            sellerCard: favorites[index].sellerID == userId,
-                          ),
-                        ),
-                        if (loaded != favoriteIds.length &&
-                            index == favorites.length - 1)
-                          isLoading
-                              ? Center(
-                                  child: CircularProgressIndicator(
-                                  color: Colors.pink,
-                                ))
-                              : ElevatedButton(
-                                  onPressed: () => loadMore(),
-                                  child: Text("Load More"))
-                      ],
-                    )),
-          ));
+        : favorites.isEmpty
+            ? Center(
+                child: Wrap(
+                alignment: WrapAlignment.center,
+                children: [
+                  Image.asset(
+                    'lib/Assets/nofavs2.gif',
+                    height: 150,
+                    fit: BoxFit.scaleDown,
+                  ),
+                  Text(
+                    "Getting Kinda lonely in here!\nFollow listings or make bids and track them in this tab!",
+                    textAlign: TextAlign.center,
+                  )
+                ],
+              ))
+            : Container(
+                child: RefreshIndicator(
+                color: Colors.pink,
+                onRefresh: () {
+                  return Future(getFavorites);
+                },
+                child: ListView.builder(
+                    itemCount: favorites.length,
+                    itemBuilder: (context, index) => Column(
+                          children: [
+                            Dismissible(
+                              key: Key(favoriteIds[index]),
+                              direction: DismissDirection.endToStart,
+                              onDismissed: (direction) =>
+                                  removeFromFavorites(index),
+                              background: Container(
+                                  color: Colors.red,
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Padding(
+                                        padding: EdgeInsets.all(10.0),
+                                        child: Text(
+                                          "Remove From\n Following",
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                      ),
+                                    ],
+                                  )),
+                              child: FavoriteCard(
+                                car: favorites[index],
+                                sellerCard: favorites[index].sellerID == userId,
+                                isHighestBidder:
+                                    favorites[index].bidderID == userId,
+                              ),
+                            ),
+                            if (loaded < favoriteIds.length &&
+                                index == favorites.length - 1)
+                              isLoading
+                                  ? Center(
+                                      child: CircularProgressIndicator(
+                                      color: Colors.pink,
+                                    ))
+                                  : ElevatedButton(
+                                      onPressed: () => loadMore(),
+                                      child: Text("Load More"))
+                          ],
+                        )),
+              ));
   }
 }

@@ -31,7 +31,7 @@ class _TabControllerScreenState extends State<TabControllerScreen> {
     'Explore',
     'Chats',
     'Listings',
-    'Favorites',
+    'Following',
   ];
 
   int pageIndex = 0;

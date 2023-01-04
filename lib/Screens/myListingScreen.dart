@@ -146,7 +146,9 @@ class _BiddingScreenState extends State<MyListingScreen> {
             )));
   }
 
-  void goToEditPage() {}
+  void goToEditPage() {
+    Navigator.of(context).pushNamed('/edit', arguments: carObj);
+  }
 
   bool onStart = true;
   bool noBidder = false;

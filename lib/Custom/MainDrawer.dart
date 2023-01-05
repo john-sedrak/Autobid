@@ -20,7 +20,7 @@ class MainDrawer extends StatelessWidget {
             Container(
               height: 90 + MediaQuery.of(context).viewPadding.top,
               width: double.infinity,
-              padding: EdgeInsets.only(bottom: 15, left: 20),
+              padding: EdgeInsets.only(bottom: 10, left: 10),
               alignment: Alignment.bottomLeft,
               color: Theme.of(context).colorScheme.secondary,
               child: Column(

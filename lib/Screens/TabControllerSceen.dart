@@ -84,13 +84,13 @@ class _TabControllerScreenState extends State<TabControllerScreen> {
   Widget build(BuildContext context) {
     return isLoading
         ? Scaffold(
-            appBar: CustomAppBar(title: labels[pageIndex]),
+            appBar: CustomAppBar(title: "AutoBid" , subtitle:labels[pageIndex]),
             body: const Center(
                 child: CircularProgressIndicator(
               color: Colors.pink,
             )))
         : Scaffold(
-            appBar: CustomAppBar(title: labels[pageIndex]),
+            appBar: CustomAppBar(title:"AutoBid", subtitle: labels[pageIndex]),
             drawer: MainDrawer(current: currentUser!),
             body: pages[pageIndex],
             floatingActionButton: pageIndex == 0 || pageIndex == 2

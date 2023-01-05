@@ -64,6 +64,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
     var stream = carsRef.snapshots();
 
     stream.listen((snapshot) {
+      _cars = [];
       snapshot.docs.forEach((carDoc) {
         setState(() {
           Map<String, dynamic> carMap = carDoc.data() as Map<String, dynamic>;

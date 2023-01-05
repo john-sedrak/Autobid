@@ -393,7 +393,7 @@ class _CarCardState extends State<CarCard> {
                             ],
                           ),
                         ),
-                        trailing: ElevatedButton(
+                        trailing: curUserObtained && curUser.id == seller.id?SizedBox.shrink():ElevatedButton(
                           child: Text(
                             "Bid",
                             style: TextStyle(fontSize: 20, color: Colors.white),

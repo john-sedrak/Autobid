@@ -59,7 +59,16 @@ class CarDetailsState extends State<CarDetails> {
     listOfModels = listOfModels.toSet().toList();
   }
 
+  int secondIndexOf(String strToRemoveFrom,String stringToFind) {
+    if (strToRemoveFrom.indexOf(stringToFind) == -1) return -1;
+    return strToRemoveFrom.indexOf(stringToFind, strToRemoveFrom.indexOf(stringToFind) + 1);
+  }
+
   String getPureModelName(String modelName, String brand) {
+    if(modelName.contains('Alfa Romeo') || modelName.contains("Aston Martin") || modelName.contains("Great Wall")
+        || modelName.contains("Land Rover") || modelName.contains("Magna Steyr")){
+          return modelName.substring(secondIndexOf(modelName,' '));
+        }
     if (modelName.contains(' ')) {
       if (brand == (modelName.substring(0, modelName.indexOf(' ')))) {
         return modelName.substring(modelName.indexOf(' ') + 1);

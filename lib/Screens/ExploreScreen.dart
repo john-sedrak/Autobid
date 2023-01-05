@@ -86,7 +86,19 @@ class _ExploreScreenState extends State<ExploreScreen> {
     });
   }
 
+  int secondIndexOf(String strToRemoveFrom,String stringToFind) {
+    if (strToRemoveFrom.indexOf(stringToFind) == -1) return -1;
+    return strToRemoveFrom.indexOf(stringToFind, strToRemoveFrom.indexOf(stringToFind) + 1);
+  }
+  bool hasSecondOccurence(String strToRemoveFrom,String stringToFind) {
+    return secondIndexOf(strToRemoveFrom,stringToFind) != -1;
+  }
+
   String getPureModelName(String modelName) {
+    if(modelName.contains('Alfa Romeo') || modelName.contains("Aston Martin") || modelName.contains("Great Wall")
+        || modelName.contains("Land Rover") || modelName.contains("Magna Steyr")){
+          return modelName.substring(secondIndexOf(modelName,' '));
+        }
     if (modelName.contains(' ')) {
       if (listOfBrands
           .contains(modelName.substring(0, modelName.indexOf(' ')))) {

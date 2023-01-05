@@ -62,11 +62,27 @@ class _LoginScreenState extends State<LoginScreen> {
       return;
     }
 
-    var authResult = null;
-
     try {
-      authResult = await authenticationInstance.signInWithEmailAndPassword(
+      var authResult = await authenticationInstance.signInWithEmailAndPassword(
           email: email, password: password);
+
+      var document = await FirebaseFirestore.instance
+          .collection("Users")
+          .doc(authenticationInstance.currentUser!.uid)
+          .get();
+
+      if (document['notifToken'] != '') {
+        showErrorMessage("User already logged in");
+        await authenticationInstance.signOut();
+        return;
+      }
+      var token = await fbm.getToken();
+      FirebaseFirestore.instance
+          .collection('Users')
+          .doc(authResult.user!.uid)
+          .update({'notifToken': token});
+      userProvider.fetchUser();
+      Navigator.of(context).pushReplacementNamed('/');
     } on FirebaseAuthException catch (e) {
       print(e.code);
       if (e.code == "user-not-found") {
@@ -78,17 +94,6 @@ class _LoginScreenState extends State<LoginScreen> {
       }
     } catch (e) {
       print(e);
-    }
-    var token = await fbm.getToken();
-    if (authResult != null) {
-      FirebaseFirestore.instance
-          .collection('Users')
-          .doc(authResult.user!.uid)
-          .update({'notifToken': token});
-      userProvider.fetchUser();
-      // Navigator.of(context)
-      //     .pushNamedAndRemoveUntil('/', (Route<dynamic> route) => false);
-      Navigator.of(context).pushReplacementNamed('/');
     }
   }
 

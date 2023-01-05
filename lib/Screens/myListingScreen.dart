@@ -32,7 +32,7 @@ class _BiddingScreenState extends State<MyListingScreen> {
   void initState() {
     super.initState();
     //--------------remove when auth-----------------------
-    // userID = FirebaseAuth.instance.currentUser!.uid;
+    userID = FirebaseAuth.instance.currentUser!.uid;
     FirebaseFirestore.instance
         .collection('Users')
         .doc(userID)
@@ -53,6 +53,11 @@ class _BiddingScreenState extends State<MyListingScreen> {
         setState(() {
           carObj = Utils.mapToCar(carObj!.id, carMap);
         });
+        if (carObj!.bidderID != "") {
+          getBidder(carObj!.bidderID).then((_) => setState(() {
+                noBidder = false;
+              }));
+        }
       });
     }).catchError((e) {
       showErrorMessage("Error! Cannot load car data!");
@@ -114,11 +119,18 @@ class _BiddingScreenState extends State<MyListingScreen> {
   Future<void> refreshCar() {
     final carsRef = FirebaseFirestore.instance.collection('Cars');
     return carsRef.doc(carObj!.id).get().then((carDoc) {
-      Map<String, dynamic> carMap = carDoc.data() as Map<String, dynamic>;
-      Car carTmp = Utils.mapToCar(carObj!.id, carMap);
-      setState(() {
-        carObj = carTmp;
-      });
+      try {
+        Map<String, dynamic> carMap = carDoc.data() as Map<String, dynamic>;
+        Car carTmp = Utils.mapToCar(carObj!.id, carMap);
+        setState(() {
+          carObj = carTmp;
+        });
+      } catch (e) {
+        if (e.toString() ==
+            "type 'Null' is not a subtype of type 'Map<String, dynamic>' in type cast") {
+          showErrorMessage("Error! Cannot load car data!");
+        }
+      }
     });
   }
 
@@ -126,10 +138,25 @@ class _BiddingScreenState extends State<MyListingScreen> {
     final usersRef = FirebaseFirestore.instance.collection('Users');
     return usersRef.doc(bidderId).get().then((userDoc) {
       bidderSnapshot = userDoc;
-      Map<String, dynamic> userMap = userDoc.data() as Map<String, dynamic>;
-      UserModel bidderTmp = Utils.mapToUser(bidderId, userMap);
+      try {
+        Map<String, dynamic> userMap = userDoc.data() as Map<String, dynamic>;
+        UserModel bidderTmp = Utils.mapToUser(bidderId, userMap);
+        setState(() {
+          bidder = bidderTmp;
+          isLoading = false;
+        });
+      } catch (e) {
+        setState(() {
+          noBidder = true;
+          bidder = null;
+          isLoading = false;
+        });
+      }
+    }).catchError((e) {
       setState(() {
-        bidder = bidderTmp;
+        noBidder = true;
+        bidder = null;
+        isLoading = false;
       });
     });
   }
@@ -146,10 +173,27 @@ class _BiddingScreenState extends State<MyListingScreen> {
             )));
   }
 
-  void goToEditPage() {}
+  void goToEditPage() {
+    Navigator.of(context).pushNamed('/edit', arguments: carObj);
+  }
+
+  FadeInImage getImage(String url, {double width = 180, double height = 180}) {
+    return FadeInImage.assetNetwork(
+      image: url,
+      placeholder: "lib/Assets/placeholder.jpg", // your assets image path
+      fit: BoxFit.cover,
+      height: height,
+      width: width,
+      imageErrorBuilder: (context, error, stackTrace) => Image.asset(
+          "lib/Assets/placeholder.jpg",
+          height: 180,
+          fit: BoxFit.cover),
+    );
+  }
 
   bool onStart = true;
   bool noBidder = false;
+
   @override
   Widget build(BuildContext context) {
     final routeArgs =
@@ -162,17 +206,16 @@ class _BiddingScreenState extends State<MyListingScreen> {
         carObj = car;
         isLoading = true;
       });
-      getBidder(car.bidderID)
-          .then((value) => setState(() {
-                isLoading = false;
-              }))
-          .catchError((e) {
-        //showErrorMessage("Connection Error! Could not load Content.");
+      if (car.bidderID != "") {
+        getBidder(car.bidderID).then((value) => setState(() {
+              isLoading = false;
+            }));
+      } else {
         setState(() {
           isLoading = false;
           noBidder = true;
         });
-      });
+      }
     } else {
       car = carObj!;
     }
@@ -221,10 +264,8 @@ class _BiddingScreenState extends State<MyListingScreen> {
                                 });
                               },
                               itemBuilder: (ctx, pagePos) {
-                                return Image.network(car.carImagePaths[pagePos],
-                                    height: 250,
-                                    width: double.infinity,
-                                    fit: BoxFit.cover);
+                                return getImage(car.carImagePaths[pagePos],
+                                    height: 250, width: double.infinity);
                               }),
                           Column(
                             mainAxisAlignment: MainAxisAlignment.end,
@@ -443,7 +484,8 @@ class _BiddingScreenState extends State<MyListingScreen> {
                                         '${car.sellerDescription}\n',
                                         style: TextStyle(fontSize: 17),
                                       ),
-                                      if (!noBidder) ...BidderWidgets(context)
+                                      if (!noBidder && carObj != null)
+                                        ...BidderWidgets(context)
                                     ]))))
                   ])),
                 ),
@@ -505,7 +547,6 @@ class _BiddingScreenState extends State<MyListingScreen> {
                       if (bidder != null) {
                         Navigator.of(context).pushNamed('/messages',
                             arguments: {'otherChatter': bidderSnapshot});
-                        ;
                       }
                     },
                     iconSize: 15)),

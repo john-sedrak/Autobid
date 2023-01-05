@@ -26,6 +26,7 @@ class _CarCardState extends State<CarCard> {
   //update this code when authentication is complete
   String userId = FirebaseAuth.instance.currentUser!.uid;
   late UserModel curUser;
+  bool curUserObtained = false;
 
   @override
   void initState() {
@@ -36,10 +37,13 @@ class _CarCardState extends State<CarCard> {
   }
 
   Future<void> getCurrentUser() async {
-    DocumentSnapshot snap =
-        await FirebaseFirestore.instance.collection('Users').doc(userId).get();
+    DocumentSnapshot snap = await FirebaseFirestore.instance
+        .collection('Users')
+        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .get();
     Map<String, dynamic> curMap = snap.data() as Map<String, dynamic>;
     curUser = Utils.mapToUser(userId, curMap);
+    curUserObtained = true;
     isFav = curUser.favorites.contains(widget.car.id);
   }
 
@@ -56,6 +60,10 @@ class _CarCardState extends State<CarCard> {
   void goToChatScreen(BuildContext context) {
     Navigator.of(context)
         .pushNamed('/messages', arguments: {'otherChatter': sellerSnapshot});
+  }
+
+  void goToEditingScreen(BuildContext context) {
+    Navigator.of(context).pushNamed('/edit', arguments: widget.car);
   }
 
   UserModel mapToUserWithoutFavorites(String id, Map<String, dynamic> map) {
@@ -88,11 +96,6 @@ class _CarCardState extends State<CarCard> {
       print(err);
     }
   }
-
-  // Future<void> addToFavorites() async {
-  //   await getCurrentUser();
-  //   Utils.addOrRemoveFromFavorites(curUser, widget.car.id);
-  // }
 
   List<Widget> indicators(imagesLength, currentIndex) {
     var apparentLength;
@@ -235,35 +238,60 @@ class _CarCardState extends State<CarCard> {
                                 widget.car.year.toString(),
                             style: const TextStyle(
                                 fontSize: 15, fontWeight: FontWeight.bold)),
-                        subtitle: SizedBox(
-                          child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Container(
-                                    child: Row(
+                        subtitle: ShaderMask(
+                          shaderCallback: (Rect rect) {
+                            return LinearGradient(
+                              begin: Alignment.centerLeft,
+                              end: Alignment.centerRight,
+                              colors: [
+                                Colors.white,
+                                Colors.white,
+                                Colors.transparent
+                              ],
+                              stops: [
+                                0.0,
+                                0.9,
+                                1.0
+                              ], // 10% purple, 80% transparent, 10% purple
+                            ).createShader(rect);
+                          },
+                          child: Scrollbar(
+                            child: SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Icon(Icons.speed),
-                                    Text(
-                                      addCommas(
-                                          " ${widget.car.mileage.round()}"),
-                                      style: TextStyle(color: Colors.grey),
+                                    Container(
+                                        child: Row(
+                                      children: [
+                                        Icon(Icons.speed),
+                                        Text(
+                                          addCommas(
+                                              " ${widget.car.mileage.round()}"),
+                                          style: TextStyle(color: Colors.grey),
+                                        ),
+                                        Text(' km',
+                                            style:
+                                                TextStyle(color: Colors.grey)),
+                                      ],
+                                    )),
+                                    Text(' '),
+                                    Container(
+                                      child: Row(
+                                        children: [
+                                          Icon(Icons.location_pin),
+                                          Text(
+                                            widget.car.location,
+                                            style:
+                                                TextStyle(color: Colors.grey),
+                                          )
+                                        ],
+                                      ),
                                     ),
-                                    Text(' km',
-                                        style: TextStyle(color: Colors.grey)),
-                                  ],
-                                )),
-                                Container(
-                                  child: Row(
-                                    children: [
-                                      Icon(Icons.location_pin),
-                                      Text(
-                                        widget.car.location,
-                                        style: TextStyle(color: Colors.grey),
-                                      )
-                                    ],
-                                  ),
-                                ),
-                              ]),
+                                  ]),
+                            ),
+                          ),
                         ),
                         trailing: Container(
                           child: Column(
@@ -279,7 +307,7 @@ class _CarCardState extends State<CarCard> {
                                     ? '${widget.car.startingPrice.round()} EGP'
                                     : '${widget.car.currentBid.round()} EGP'),
                                 style: TextStyle(
-                                    fontSize: 20, fontWeight: FontWeight.bold),
+                                    fontSize: 18, fontWeight: FontWeight.bold),
                               ),
                               Text(
                                   'Valid until ' +
@@ -308,32 +336,47 @@ class _CarCardState extends State<CarCard> {
                                         fontSize: 25, color: Colors.white),
                                   )),
                               Text('  '),
-                              CircleAvatar(
-                                  backgroundColor: Colors.blue,
-                                  radius: 15,
-                                  child: IconButton(
-                                      icon: const Icon(Icons.chat_rounded,
-                                          color: Colors.white),
-                                      onPressed: () {
-                                        if (_userLoaded) {
-                                          goToChatScreen(context);
-                                        }
-                                      },
-                                      iconSize: 15)),
+                              curUserObtained && curUser.id == seller.id
+                                  ? CircleAvatar(
+                                      backgroundColor: Colors.grey,
+                                      radius: 15,
+                                      child: IconButton(
+                                          icon: const Icon(Icons.edit,
+                                              color: Colors.white),
+                                          onPressed: () {
+                                            if (_userLoaded) {
+                                              goToEditingScreen(context);
+                                            }
+                                          },
+                                          iconSize: 15))
+                                  : CircleAvatar(
+                                      backgroundColor: Colors.blue,
+                                      radius: 15,
+                                      child: IconButton(
+                                          icon: const Icon(Icons.chat_rounded,
+                                              color: Colors.white),
+                                          onPressed: () {
+                                            if (_userLoaded) {
+                                              goToChatScreen(context);
+                                            }
+                                          },
+                                          iconSize: 15)),
                               Text('   '),
-                              CircleAvatar(
-                                  backgroundColor: Colors.green,
-                                  radius: 15,
-                                  child: IconButton(
-                                      icon: const Icon(Icons.phone,
-                                          color: Colors.white),
-                                      onPressed: () async {
-                                        if (_userLoaded) {
-                                          Utils.dialPhoneNumber(
-                                              seller.phoneNumber);
-                                        }
-                                      },
-                                      iconSize: 15)),
+                              curUserObtained && curUser.id == seller.id
+                                  ? SizedBox.shrink()
+                                  : CircleAvatar(
+                                      backgroundColor: Colors.green,
+                                      radius: 15,
+                                      child: IconButton(
+                                          icon: const Icon(Icons.phone,
+                                              color: Colors.white),
+                                          onPressed: () async {
+                                            if (_userLoaded) {
+                                              Utils.dialPhoneNumber(
+                                                  seller.phoneNumber);
+                                            }
+                                          },
+                                          iconSize: 15)),
                             ],
                           ),
                         ),

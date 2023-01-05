@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../Lists/brands.dart';
+import 'AuthenticationScreens/errorMessage.dart';
 import 'CarDetails.dart';
 import 'UploadPhotos.dart';
 import 'dart:io';
@@ -18,17 +19,18 @@ class AddCarScreen extends StatefulWidget {
 }
 
 class _AddCarScreenState extends State<AddCarScreen> {
-  // final FirebaseAuth auth = FirebaseAuth.instance;
+  final FirebaseAuth auth = FirebaseAuth.instance;
   @override
   final carsRef = FirebaseFirestore.instance.collection('Cars');
   int _currentStep = 0;
   final detailsKey = GlobalKey<FormState>();
   Map<String, Object> brandDateLocation = {
     "brand": "",
-    "date": DateTime.now(),
+    "model": "",
+    "date": "",
     "location": ""
   };
-  TextEditingController modelController = new TextEditingController();
+  //TextEditingController modelController = new TextEditingController();
   TextEditingController yearController = new TextEditingController();
   TextEditingController descriptionController = new TextEditingController();
   TextEditingController mileageController = new TextEditingController();
@@ -56,10 +58,10 @@ class _AddCarScreenState extends State<AddCarScreen> {
   }
 
   postCar() async {
-    // final User? user = await auth.currentUser;
+    final User? user = await auth.currentUser;
     carsRef.doc().set({
       'brand': brandDateLocation["brand"],
-      'model': modelController.text,
+      'model': brandDateLocation["model"],
       'year': yearController.text,
       'description': descriptionController.text,
       'mileage': mileageController.text,
@@ -67,7 +69,7 @@ class _AddCarScreenState extends State<AddCarScreen> {
       'images': downloadUrls,
       'validUntil': brandDateLocation["date"],
       'location': brandDateLocation["location"],
-      'sellerID': "5Hq5HL1TRdS7iz4Uz7Oi7uQsb5G2", //HARDCODED
+      'sellerID': user!.uid, //HARDCODED
       'bidderID': "",
       'currentBid': 0
     });
@@ -87,7 +89,7 @@ class _AddCarScreenState extends State<AddCarScreen> {
           content: CarDetails(
             formKey: detailsKey,
             brandDateLocation: brandDateLocation,
-            modelController: modelController,
+            //  modelController: modelController,
             yearController: yearController,
             descriptionController: descriptionController,
             mileageController: mileageController,
@@ -100,13 +102,26 @@ class _AddCarScreenState extends State<AddCarScreen> {
           title: Text('Photos'),
           content: UploadPhotos(
             allPhotos: allPictures,
+            downloadUrls: downloadUrls,
           ),
           state: _stepState(1),
           isActive: _currentStep == 1,
         ),
       ];
+
   @override
   Widget build(BuildContext context) {
+    void showErrorMessage(String msg) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: Colors.grey.shade300,
+        elevation: 0,
+        content: errorMessage(
+          message: msg,
+        ),
+        behavior: SnackBarBehavior.floating,
+      ));
+    }
+
     return Scaffold(
         appBar: AppBar(
           iconTheme: IconThemeData(
@@ -173,7 +188,10 @@ class _AddCarScreenState extends State<AddCarScreen> {
                 });
               } else if (_currentStep == 1 && allPictures.length > 0) {
                 await uploadFiles();
-                postCar();
+                await postCar();
+                Navigator.of(context).pop();
+              } else if (_currentStep == 1 && !(allPictures.length > 0)) {
+                showErrorMessage("Add at least one image of the car.");
               }
             },
             onStepCancel: () {
@@ -189,32 +207,5 @@ class _AddCarScreenState extends State<AddCarScreen> {
             steps: _steps(),
           ),
         )));
-  }
-}
-
-class _StartingPrice extends StatelessWidget {
-  const _StartingPrice({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        TextFormField(
-          decoration: const InputDecoration(
-            labelText: 'Street',
-          ),
-        ),
-        TextFormField(
-          decoration: const InputDecoration(
-            labelText: 'City',
-          ),
-        ),
-        TextFormField(
-          decoration: const InputDecoration(
-            labelText: 'Postcode',
-          ),
-        ),
-      ],
-    );
   }
 }

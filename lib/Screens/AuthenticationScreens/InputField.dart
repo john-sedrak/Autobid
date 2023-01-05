@@ -6,12 +6,16 @@ class InputField extends StatelessWidget {
   TextEditingController controller;
   final String tag;
   final bool isPassword;
+  final bool isEmail;
+  final bool isPhone;
 
   InputField(
       {super.key,
       required this.controller,
       required this.tag,
-      required this.isPassword});
+      required this.isPassword,
+      required this.isEmail,
+      required this.isPhone});
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +41,13 @@ class InputField extends StatelessWidget {
               width: 270,
               height: 35,
               child: TextField(
+                cursorColor: Colors.black,
                 obscureText: isPassword,
+                keyboardType: (isEmail)
+                    ? TextInputType.emailAddress
+                    : (isPhone)
+                        ? TextInputType.phone
+                        : TextInputType.text,
                 controller: controller,
                 decoration: const InputDecoration(
                     focusedBorder: OutlineInputBorder(

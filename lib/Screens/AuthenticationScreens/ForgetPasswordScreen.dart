@@ -100,6 +100,8 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
                               controller: emailController,
                               tag: "Email",
                               isPassword: false,
+                              isEmail: true,
+                              isPhone: false,
                             ),
                             Container(
                                 width: double.infinity,

@@ -48,7 +48,7 @@ class _ChatTileState extends State<ChatTile> {
       });
     });
     widget.chatSnapshot.reference.snapshots().listen((event) {
-      if(mounted){
+      if (mounted) {
         setState(() {
           _unreadCount = event.get('unread.${userRef.id}');
         });
@@ -80,6 +80,10 @@ class _ChatTileState extends State<ChatTile> {
     super.initState();
   }
 
+  bool isMyMessage() {
+    return latestText['sender'] == userRef;
+  }
+
   @override
   Widget build(BuildContext context) {
     DateTime currentTime = DateTime.now();
@@ -104,7 +108,9 @@ class _ChatTileState extends State<ChatTile> {
                   margin: const EdgeInsets.only(top: 5),
                   child: Text(
                     _latestTextFetched
-                        ? latestText['content']
+                        ? (isMyMessage()
+                            ? 'You: ${latestText['content']}'
+                            : '${otherChatter.data()!['name'].toString().split(' ')[0]}: ${latestText['content']}')
                         : "Tap here to start chatting!",
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(fontSize: 16),
@@ -132,8 +138,7 @@ class _ChatTileState extends State<ChatTile> {
                                 ? Text(
                                     _unreadCount.toString(),
                                     textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                        color: Colors.white),
+                                    style: TextStyle(color: Colors.white),
                                   )
                                 : null),
                       ],
@@ -142,9 +147,8 @@ class _ChatTileState extends State<ChatTile> {
             ),
           )
         : ListTile(
-            title: Center(
-                child: CircularProgressIndicator(
-                    color: Theme.of(context).colorScheme.secondary)),
+            leading: CircularProgressIndicator(
+                color: Theme.of(context).colorScheme.secondary),
           );
   }
 }

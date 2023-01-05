@@ -121,16 +121,16 @@ class _CarCardState extends State<CarCard> {
     return List<Widget>.generate(apparentLength, (index) {
       return Container(
         margin: EdgeInsets.all(3),
-        width: shrinkMode < 2 && index == 6
+        width: shrinkMode == 4?(apparentIndex == index ? 12 : 8): (shrinkMode < 2 && index == 6
             ? 5
             : (shrinkMode > 0 && index == 0
                 ? 5
-                : (apparentIndex == index ? 12 : 8)),
-        height: shrinkMode < 2 && index == 6
+                : (apparentIndex == index ? 12 : 8))),
+        height: shrinkMode == 4?(apparentIndex == index ? 12 : 8): (shrinkMode < 2 && index == 6
             ? 5
             : (shrinkMode > 0 && index == 0
                 ? 5
-                : (apparentIndex == index ? 12 : 8)),
+                : (apparentIndex == index ? 12 : 8))),
         decoration:
             BoxDecoration(color: Colors.white70, shape: BoxShape.circle),
       );

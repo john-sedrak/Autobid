@@ -61,7 +61,7 @@ class _CarCardState extends State<CarCard> {
   }
   void goToEditingScreen(BuildContext context) {
     Navigator.of(context)
-        .pushNamed('/medit', arguments: {'carObj': widget.car});
+        .pushNamed('/edit', arguments: widget.car);
   }
 
   UserModel mapToUserWithoutFavorites(String id, Map<String, dynamic> map) {
@@ -236,35 +236,51 @@ class _CarCardState extends State<CarCard> {
                                 widget.car.year.toString(),
                             style: const TextStyle(
                                 fontSize: 15, fontWeight: FontWeight.bold)),
-                        subtitle: SizedBox(
-                          child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Container(
-                                    child: Row(
+                        subtitle: ShaderMask(
+                              shaderCallback: (Rect rect) {
+                                return LinearGradient(
+                                  begin: Alignment.centerLeft,
+                                  end: Alignment.centerRight,
+                                  colors: [Colors.white, Colors.white, Colors.transparent],
+                                  stops: [0.0, 0.9, 1.0], // 10% purple, 80% transparent, 10% purple
+                                ).createShader(rect);
+                              },
+                              child:
+                            
+                            Scrollbar(
+                              child: SingleChildScrollView(
+                                scrollDirection: Axis.horizontal,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Icon(Icons.speed),
-                                    Text(
-                                      addCommas(
-                                          " ${widget.car.mileage.round()}"),
-                                      style: TextStyle(color: Colors.grey),
+                                    Container(
+                                        child: Row(
+                                      children: [
+                                        Icon(Icons.speed),
+                                        Text(
+                                          addCommas(
+                                              " ${widget.car.mileage.round()}"),
+                                          style: TextStyle(color: Colors.grey),
+                                        ),
+                                        Text(' km',
+                                            style: TextStyle(color: Colors.grey)),
+                                      ],
+                                    )),
+                                    Text(' '),
+                                    Container(
+                                      child: Row(
+                                        children: [
+                                          Icon(Icons.location_pin),
+                                          Text(
+                                            widget.car.location,
+                                            style: TextStyle(color: Colors.grey),
+                                          )
+                                        ],
+                                      ),
                                     ),
-                                    Text(' km',
-                                        style: TextStyle(color: Colors.grey)),
-                                  ],
-                                )),
-                                Container(
-                                  child: Row(
-                                    children: [
-                                      Icon(Icons.location_pin),
-                                      Text(
-                                        widget.car.location,
-                                        style: TextStyle(color: Colors.grey),
-                                      )
-                                    ],
-                                  ),
-                                ),
-                              ]),
+                                  ]),
+                              ),
+                            ),
                         ),
                         trailing: Container(
                           child: Column(
@@ -280,7 +296,7 @@ class _CarCardState extends State<CarCard> {
                                     ? '${widget.car.startingPrice.round()} EGP'
                                     : '${widget.car.currentBid.round()} EGP'),
                                 style: TextStyle(
-                                    fontSize: 20, fontWeight: FontWeight.bold),
+                                    fontSize: 18, fontWeight: FontWeight.bold),
                               ),
                               Text(
                                   'Valid until ' +

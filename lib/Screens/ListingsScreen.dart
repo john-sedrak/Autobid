@@ -38,6 +38,7 @@ class _ListingsScreenState extends State<ListingsScreen> {
     var stream = carsRef.where("sellerID", isEqualTo: user!.uid).snapshots();
 
     stream.listen((snapshot) {
+      _cars = [];
       snapshot.docs.forEach((carDoc) {
         setState(() {
           Map<String, dynamic> carMap = carDoc.data() as Map<String, dynamic>;

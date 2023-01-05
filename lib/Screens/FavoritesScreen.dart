@@ -82,10 +82,11 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
             loaded++;
           } catch (e) {
             if (e.toString() ==
-                "type 'Null' is not a subtype of type 'Map<String, dynamic>' in type cast") {
+                    "type 'Null' is not a subtype of type 'Map<String, dynamic>' in type cast" &&
+                i < newFavIds.length) {
               newFavIds.removeAt(i);
             }
-            loaded++;
+            // loaded++;
           }
         }
 
@@ -136,10 +137,11 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
         loaded++;
       } catch (e) {
         if (e.toString() ==
-            "type 'Null' is not a subtype of type 'Map<String, dynamic>' in type cast") {
+                "type 'Null' is not a subtype of type 'Map<String, dynamic>' in type cast" &&
+            i < newFavIds.length) {
           newFavIds.removeAt(i);
         }
-        loaded++;
+        //loaded++;
       }
 
       if (favoriteIds.length != newFavIds.length) {

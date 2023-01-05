@@ -140,13 +140,14 @@ class _FavoriteCardState extends State<FavoriteCard> {
                                               style: const TextStyle(
                                                   fontSize: 10)),
                                           Text(
-                                            addCommas(widget.car.bidderID == ''
-                                                ? '${widget.car.startingPrice.round()} EGP'
-                                                : '${widget.car.currentBid.round()} EGP'),
-                                            style: const TextStyle(
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.bold),
-                                          ),
+                                              addCommas(widget.car.bidderID ==
+                                                      ''
+                                                  ? '${widget.car.startingPrice.round()} EGP'
+                                                  : '${widget.car.currentBid.round()} EGP'),
+                                              style: const TextStyle(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.bold,
+                                                  overflow: TextOverflow.fade)),
                                           Text(
                                               'Until ${DateFormat('dd-MM-yy').format(widget.car.validUntil)}',
                                               style: const TextStyle(

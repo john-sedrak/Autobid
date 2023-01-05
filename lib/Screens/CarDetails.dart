@@ -38,7 +38,7 @@ class CarDetailsState extends State<CarDetails> {
     brandModelInfo = await json.decode(data);
 
     setState(() {
-      listOfBrands = brandModelInfo.keys.toList();
+      listOfBrands = brandModelInfo.keys.toSet().toList();
       listOfBrands.sort();
       if (widget.brandDateLocation["model"] != "") {
         updateModelList(widget.brandDateLocation["brand"].toString());
@@ -55,6 +55,8 @@ class CarDetailsState extends State<CarDetails> {
     modelList.forEach((element) {
       listOfModels.add(getPureModelName(element['Name'], brand));
     });
+
+    listOfModels = listOfModels.toSet().toList();
   }
 
   String getPureModelName(String modelName, String brand) {

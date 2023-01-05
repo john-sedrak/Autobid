@@ -27,7 +27,7 @@ class _EditScreenState extends State<EditScreen> {
   final carsRef = FirebaseFirestore.instance.collection('Cars');
   int _currentStep = 0;
   final detailsKey = GlobalKey<FormState>();
-
+  bool isLoading = false;
   _stepState(int step) {
     if (_currentStep > step) {
       return StepState.complete;
@@ -176,97 +176,111 @@ class _EditScreenState extends State<EditScreen> {
                   secondary: Colors.pink,
                 ),
           ),
-          child: Stepper(
-            controlsBuilder: (BuildContext context, ControlsDetails controls) {
-              return Padding(
-                padding: const EdgeInsets.symmetric(vertical: 16.0),
-                child: Column(children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    mainAxisAlignment: _currentStep != 0
-                        ? MainAxisAlignment.spaceBetween
-                        : MainAxisAlignment.end,
-                    children: <Widget>[
-                      if (_currentStep != 0)
-                        OutlinedButton(
-                          style: ButtonStyle(
-                              side: MaterialStateProperty.all(
-                                  BorderSide(color: Colors.pink))),
-                          onPressed: controls.onStepCancel,
-                          child: const Text(
-                            'BACK',
-                            style: TextStyle(color: Colors.pink),
-                          ),
+          child: isLoading
+              ? Center(
+                  child: CircularProgressIndicator(
+                  color: Colors.pink,
+                ))
+              : Stepper(
+                  controlsBuilder:
+                      (BuildContext context, ControlsDetails controls) {
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 16.0),
+                      child: Column(children: [
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          mainAxisAlignment: _currentStep != 0
+                              ? MainAxisAlignment.spaceBetween
+                              : MainAxisAlignment.end,
+                          children: <Widget>[
+                            if (_currentStep != 0)
+                              OutlinedButton(
+                                style: ButtonStyle(
+                                    side: MaterialStateProperty.all(
+                                        BorderSide(color: Colors.pink))),
+                                onPressed: controls.onStepCancel,
+                                child: const Text(
+                                  'BACK',
+                                  style: TextStyle(color: Colors.pink),
+                                ),
+                              ),
+                            ElevatedButton(
+                              onPressed: controls.onStepContinue,
+                              child: Text(
+                                _currentStep == 0 ? 'NEXT' : 'UPDATE',
+                                style: TextStyle(color: Colors.white),
+                              ),
+                            ),
+                          ],
                         ),
-                      ElevatedButton(
-                        onPressed: controls.onStepContinue,
-                        child: Text(
-                          _currentStep == 0 ? 'NEXT' : 'UPDATE',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Center(
-                        child: OutlinedButton(
-                          style: ButtonStyle(
-                              side: MaterialStateProperty.all(
-                                  BorderSide(color: Colors.red.shade900))),
-                          onPressed: () async {
-                            await deleteListing();
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Center(
+                              child: OutlinedButton(
+                                style: ButtonStyle(
+                                    side: MaterialStateProperty.all(BorderSide(
+                                        color: Colors.red.shade900))),
+                                onPressed: () async {
+                                  setState(() {
+                                    isLoading = true;
+                                  });
+                                  await deleteListing();
 
-                            Navigator.popUntil(
-                              context,
-                              ModalRoute.withName('/'),
-                            );
-                          },
-                          child: const Text(
-                            'DELETE LISTING',
-                            style: TextStyle(color: Colors.red),
-                          ),
-                        ),
-                      )
-                    ],
-                  )
-                ]),
-              );
-            },
-            type: StepperType.horizontal,
-            onStepTapped: (step) => setState(() => _currentStep = step),
-            onStepContinue: () async {
-              if (_currentStep == 0 && detailsKey.currentState!.validate()) {
-                setState(() {
-                  if (_currentStep < _steps().length - 1) {
-                    _currentStep += 1;
-                  } else {
-                    _currentStep = 0;
-                  }
-                });
-              } else if (_currentStep == 1 && (downloadUrls.length > 0) ||
-                  allPictures.length > 0) {
-                await uploadFiles();
-                await postCar();
-                Navigator.of(context).pop();
-              } else if (_currentStep == 1 &&
-                  (!(downloadUrls.length > 0) || !(allPictures.length > 0))) {
-                showErrorMessage("Add at least one image of the car.");
-              }
-            },
-            onStepCancel: () {
-              setState(() {
-                if (_currentStep > 0) {
-                  _currentStep -= 1;
-                } else {
-                  _currentStep = 0;
-                }
-              });
-            },
-            currentStep: _currentStep,
-            steps: _steps(),
-          ),
+                                  Navigator.popUntil(
+                                    context,
+                                    ModalRoute.withName('/'),
+                                  );
+                                },
+                                child: const Text(
+                                  'DELETE LISTING',
+                                  style: TextStyle(color: Colors.red),
+                                ),
+                              ),
+                            )
+                          ],
+                        )
+                      ]),
+                    );
+                  },
+                  type: StepperType.horizontal,
+                  onStepTapped: (step) => setState(() => _currentStep = step),
+                  onStepContinue: () async {
+                    if (_currentStep == 0 &&
+                        detailsKey.currentState!.validate()) {
+                      setState(() {
+                        if (_currentStep < _steps().length - 1) {
+                          _currentStep += 1;
+                        } else {
+                          _currentStep = 0;
+                        }
+                      });
+                    } else if (_currentStep == 1 && (downloadUrls.length > 0) ||
+                        allPictures.length > 0) {
+                      setState(() {
+                        isLoading = true;
+                      });
+                      await uploadFiles();
+                      await postCar();
+                      Navigator.of(context).pop();
+                    } else if (_currentStep == 1 &&
+                        (!(downloadUrls.length > 0) ||
+                            !(allPictures.length > 0))) {
+                      showErrorMessage("Add at least one image of the car.");
+                    }
+                  },
+                  onStepCancel: () {
+                    setState(() {
+                      if (_currentStep > 0) {
+                        _currentStep -= 1;
+                      } else {
+                        _currentStep = 0;
+                      }
+                    });
+                  },
+                  currentStep: _currentStep,
+                  steps: _steps(),
+                ),
         )));
   }
 }

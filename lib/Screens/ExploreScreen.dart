@@ -64,6 +64,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
 
     stream.listen(
       (snapshot) {
+        _cars = [];
         snapshot.docs.forEach(
           (carDoc) { 
             setState(() {

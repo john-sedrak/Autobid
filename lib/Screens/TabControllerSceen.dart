@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:provider/provider.dart';
 
+import '../Services/local_notification_service.dart';
 import 'ChatsScreen.dart';
 import 'ExploreScreen.dart';
 import 'FavoritesScreen.dart';
@@ -49,58 +50,12 @@ class _TabControllerScreenState extends State<TabControllerScreen> {
   @override
   void initState() {
     // TODO: implement initState
-    FirebaseMessaging.instance
-        .getToken()
-        .then((value) => print("token:  $value"));
 
-    FirebaseMessaging.onMessageOpenedApp.listen((message) {
-      print('opened notification');
-
-      if (message.data['screen'] == '/messages') {
-        FirebaseFirestore.instance
-            .doc(message.data['senderRef'])
-            .get()
-            .then((otherChatter) {
-          if (Navigator.canPop(context)) {
-            Navigator.of(context).pushReplacementNamed(message.data['screen'],
-                arguments: {'otherChatter': otherChatter});
-          } else {
-            Navigator.of(context).pushNamed(message.data['screen'],
-                arguments: {'otherChatter': otherChatter});
-          }
-        });
-      } else if (message.data['screen'] == '/bidRoot') {
-        String carId = message.data['carId'];
-        FirebaseFirestore.instance.doc("Cars/$carId").get().then((value) {
-          Map<String, dynamic> carMap = value.data() as Map<String, dynamic>;
-          Car car = Utils.mapToCar(carId, carMap);
-
-          if (Navigator.canPop(context)) {
-            Navigator.of(context).pushReplacementNamed('/bidRoute',
-                arguments: {'car': car, 'isExpanded': true});
-          } else {
-            Navigator.of(context).pushNamed('/bidRoute',
-                arguments: {'car': car, 'isExpanded': true});
-          }
-        });
-      } else if (message.data['screen'] == "/myListingRoute") {
-        String carId = message.data['carId'];
-        FirebaseFirestore.instance.doc("Cars/$carId").get().then((value) {
-          Map<String, dynamic> carMap = value.data() as Map<String, dynamic>;
-          Car car = Utils.mapToCar(carId, carMap);
-
-          if (Navigator.canPop(context)) {
-            Navigator.of(context).pushReplacementNamed('/myListingRoute',
-                arguments: {'car': car});
-          } else {
-            Navigator.of(context)
-                .pushNamed('/myListingRoute', arguments: {'car': car});
-          }
-        });
-      }
-    });
     super.initState();
-  }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      LocalNotificationService.setContext(context);
+    });
+}
 
   @override
   Widget build(BuildContext context) {

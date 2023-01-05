@@ -52,12 +52,13 @@ class _ChatsScreenState extends State<ChatsScreen> {
   }
 
   void populateFetchedChatLists(var chats) {
-    if (chatMaps.isEmpty) {
+    if (chats.length != chatMaps.length||chatMaps.isEmpty) {
+      chatMaps.clear();
       for (int i = 0; i < chats.length; i++) {
         var element = chats[i];
 
         chatMaps.add(ChatTile(
-            key: ValueKey(i),
+            key: ValueKey(element.reference.path),
             chatSnapshot: element,
             otherChatterFuture: getChatterFuture(element)));
       }

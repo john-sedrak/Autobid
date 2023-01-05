@@ -66,16 +66,6 @@ class _LoginScreenState extends State<LoginScreen> {
       var authResult = await authenticationInstance.signInWithEmailAndPassword(
           email: email, password: password);
 
-      var document = await FirebaseFirestore.instance
-          .collection("Users")
-          .doc(authenticationInstance.currentUser!.uid)
-          .get();
-
-      if (document['notifToken'] != '') {
-        showErrorMessage("User already logged in");
-        await authenticationInstance.signOut();
-        return;
-      }
       var token = await fbm.getToken();
       FirebaseFirestore.instance
           .collection('Users')

@@ -80,7 +80,6 @@ class _ListingsScreenState extends State<ListingsScreen> {
                       children: [
                         Column(
                           children: [
-                            Container(height: 55),
                             Expanded(
                               child: ListView.builder(
                                   itemCount: _cars.length,

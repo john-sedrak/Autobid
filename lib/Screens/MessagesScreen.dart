@@ -7,6 +7,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+import '../Services/local_notification_service.dart';
+
 class MessagesScreen extends StatefulWidget {
   @override
   State<MessagesScreen> createState() => _MessagesScreenState();
@@ -56,9 +58,9 @@ class _MessagesScreenState extends State<MessagesScreen> {
 
   @override
   void dispose() {
-    print('disposing');
 
     chatRef.update({'unread.${userRef.id}': 0});
+    LocalNotificationService.setChatContext(null);
     super.dispose();
   }
 
@@ -66,6 +68,9 @@ class _MessagesScreenState extends State<MessagesScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      LocalNotificationService.setChatContext(context);
+    });
   }
 
   @override
@@ -235,7 +240,6 @@ class _MessagesScreenState extends State<MessagesScreen> {
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
                   var texts = snapshot.data!.docs;
-                  // print(texts[0].data());
 
                   return ListView.builder(
                     padding: EdgeInsets.only(bottom: 10),

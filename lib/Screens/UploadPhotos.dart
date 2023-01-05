@@ -36,9 +36,7 @@ class _UploadPhotosState extends State<UploadPhotos> {
         }
 
         //uploadFile();
-      } else {
-        print('No image selected.');
-      }
+      } 
     });
   }
 
@@ -50,8 +48,6 @@ class _UploadPhotosState extends State<UploadPhotos> {
         _photo = File(pickedFile.path);
         widget.allPhotos.add(_photo);
         // uploadFile();
-      } else {
-        print('No image selected.');
       }
     });
   }
@@ -65,7 +61,6 @@ class _UploadPhotosState extends State<UploadPhotos> {
   //     final ref = FirebaseStorage.instance.ref(destination).child('file/');
   //     await ref.putFile(_photo!);
   //     String url = await ref.getDownloadURL();
-  //     // print(url);
   //   } catch (e) {
   //     print('error occured');
   //   }

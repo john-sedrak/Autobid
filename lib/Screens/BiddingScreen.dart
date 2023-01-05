@@ -77,7 +77,6 @@ class _BiddingScreenState extends State<BiddingScreen> {
   //   DocumentSnapshot userDoc = await usersRef.doc(userID).get();
   //   Map<String, dynamic> userMap = userDoc.data() as Map<String, dynamic>;
   //   UserModel currentUser = Utils.mapToUser(userID, userMap);
-  //   // print(currentUser.favorites);
   // }
 
   List<Widget> indicators(imagesLength, currentIndex) {
@@ -104,16 +103,16 @@ class _BiddingScreenState extends State<BiddingScreen> {
     return List<Widget>.generate(apparentLength, (index) {
       return Container(
         margin: EdgeInsets.all(3),
-        width: shrinkMode < 2 && index == 6
+        width: shrinkMode == 4?(apparentIndex == index ? 12 : 8): (shrinkMode < 2 && index == 6
             ? 5
             : (shrinkMode > 0 && index == 0
                 ? 5
-                : (apparentIndex == index ? 12 : 8)),
-        height: shrinkMode < 2 && index == 6
+                : (apparentIndex == index ? 12 : 8))),
+        height: shrinkMode == 4?(apparentIndex == index ? 12 : 8): (shrinkMode < 2 && index == 6
             ? 5
             : (shrinkMode > 0 && index == 0
                 ? 5
-                : (apparentIndex == index ? 12 : 8)),
+                : (apparentIndex == index ? 12 : 8))),
         decoration:
             BoxDecoration(color: Colors.white70, shape: BoxShape.circle),
       );
@@ -181,11 +180,9 @@ class _BiddingScreenState extends State<BiddingScreen> {
     setState(() {
       isExpanded = !isExpanded;
     });
-    // print(isExpanded);
   }
 
   void confirmBid(BuildContext ctx) {
-    // print("confirm click");
     displayDialog(ctx);
   }
 

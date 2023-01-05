@@ -142,6 +142,20 @@ class _CarCardState extends State<CarCard> {
         RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},');
   }
 
+  FadeInImage getImage(String url, {double width = 180, double height = 180}) {
+    return FadeInImage.assetNetwork(
+      image: url,
+      placeholder: "lib/Assets/placeholder.jpg", // your assets image path
+      fit: BoxFit.cover,
+      height: height,
+      width: width,
+      imageErrorBuilder: (context, error, stackTrace) => Image.asset(
+          "lib/Assets/placeholder.jpg",
+          height: 180,
+          fit: BoxFit.cover),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return InkWell(
@@ -173,11 +187,10 @@ class _CarCardState extends State<CarCard> {
                                 });
                               },
                               itemBuilder: (ctx, pagePos) {
-                                return Image.network(
+                                return getImage(
                                     widget.car.carImagePaths[pagePos],
-                                    height: 150,
-                                    width: double.infinity,
-                                    fit: BoxFit.cover);
+                                    height: 250,
+                                    width: double.infinity);
                               }),
                           Column(
                             mainAxisAlignment: MainAxisAlignment.end,
@@ -380,7 +393,7 @@ class _CarCardState extends State<CarCard> {
                             ],
                           ),
                         ),
-                        trailing: curUserObtained && curUser.id == seller.id?SizedBox.shrink():ElevatedButton(
+                        trailing: ElevatedButton(
                           child: Text(
                             "Bid",
                             style: TextStyle(fontSize: 20, color: Colors.white),

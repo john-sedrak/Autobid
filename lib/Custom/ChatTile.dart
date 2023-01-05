@@ -133,7 +133,7 @@ class _ChatTileState extends State<ChatTile> {
                                     _unreadCount.toString(),
                                     textAlign: TextAlign.center,
                                     style: TextStyle(
-                                        color: Colors.white, fontSize: 16),
+                                        color: Colors.white),
                                   )
                                 : null),
                       ],

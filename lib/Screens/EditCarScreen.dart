@@ -113,6 +113,7 @@ class _EditScreenState extends State<EditScreen> {
 
     postCar() async {
       final User? user = await auth.currentUser;
+      var oldUrls = List.from(args.carImagePaths);
       print(args.id);
       carsRef.doc(args.id).update({
         'brand': brandDateLocation["brand"],
@@ -128,10 +129,19 @@ class _EditScreenState extends State<EditScreen> {
         'bidderID': args.bidderID,
         'currentBid': args.currentBid
       });
+      oldUrls.forEach((element) {
+        if (!downloadUrls.contains(element)) {
+          FirebaseStorage.instance.refFromURL(element).delete();
+        }
+      });
     }
 
     deleteListing() async {
+      var oldUrls = args.carImagePaths;
       carsRef.doc(args.id).delete();
+      oldUrls.forEach((element) {
+        FirebaseStorage.instance.refFromURL(element).delete();
+      });
     }
 
     void showErrorMessage(String msg) {

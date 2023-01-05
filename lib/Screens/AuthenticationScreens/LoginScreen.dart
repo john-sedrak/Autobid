@@ -160,7 +160,6 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void navigateToForget() {
-    print('forgetiing');
     Navigator.of(context).pushNamed('/forgetPassword');
   }
 

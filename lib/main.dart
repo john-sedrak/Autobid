@@ -31,17 +31,13 @@ Future<void> notifHandler(RemoteMessage message) async {
 //await Firebase.initializeApp();
   print("Handling message: ${message.data}");
 
-  print(LocalNotificationService.chatContext);
   if (LocalNotificationService.chatContext != null) {
   var routeArgs = ModalRoute.of(LocalNotificationService.chatContext!)!.settings.arguments
       as Map<String, dynamic>;
-      print(message.data['senderRef']);
-      print(routeArgs['otherChatter'].reference.path);
   if (routeArgs['otherChatter'] != null &&
       message.data['senderRef'] == routeArgs['otherChatter'].reference.path) {
     return;
   }
-  print(routeArgs['otherChatterRef']);
   if (routeArgs['otherChatterRef'] != null &&
       message.data['senderRef'] == routeArgs['otherChatterRef']) {
     return;

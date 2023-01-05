@@ -58,7 +58,6 @@ class _MessagesScreenState extends State<MessagesScreen> {
 
   @override
   void dispose() {
-    print('disposing');
 
     chatRef.update({'unread.${userRef.id}': 0});
     LocalNotificationService.setChatContext(null);
@@ -241,7 +240,6 @@ class _MessagesScreenState extends State<MessagesScreen> {
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
                   var texts = snapshot.data!.docs;
-                  // print(texts[0].data());
 
                   return ListView.builder(
                     padding: EdgeInsets.only(bottom: 10),

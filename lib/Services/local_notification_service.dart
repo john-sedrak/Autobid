@@ -50,18 +50,11 @@ class LocalNotificationService {
   }
 
   static void onTapNotification(NotificationResponse response) {
-    print("tapped");
-    print(_context);
-    print(response.payload);
-    print(_context == null);
-    print(response.payload == null);
     if (_context == null || response.payload == null) {
-      print('in if');
       return;
     }
 
     var message = jsonDecode(response.payload!);
-    print(message);
 
     if (message['screen'] == '/messages') {
       FirebaseFirestore.instance

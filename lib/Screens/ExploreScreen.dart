@@ -58,7 +58,6 @@ class _ExploreScreenState extends State<ExploreScreen> {
       _cars = [];
     });
 
-    print(queryBrands);
 
     var stream = carsRef.snapshots();
 

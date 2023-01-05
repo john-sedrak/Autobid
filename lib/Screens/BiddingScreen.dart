@@ -77,7 +77,6 @@ class _BiddingScreenState extends State<BiddingScreen> {
   //   DocumentSnapshot userDoc = await usersRef.doc(userID).get();
   //   Map<String, dynamic> userMap = userDoc.data() as Map<String, dynamic>;
   //   UserModel currentUser = Utils.mapToUser(userID, userMap);
-  //   // print(currentUser.favorites);
   // }
 
   List<Widget> indicators(imagesLength, currentIndex) {
@@ -181,11 +180,9 @@ class _BiddingScreenState extends State<BiddingScreen> {
     setState(() {
       isExpanded = !isExpanded;
     });
-    // print(isExpanded);
   }
 
   void confirmBid(BuildContext ctx) {
-    // print("confirm click");
     displayDialog(ctx);
   }
 

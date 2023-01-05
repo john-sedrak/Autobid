@@ -102,7 +102,6 @@ class _EditScreenState extends State<EditScreen> {
           final ref = FirebaseStorage.instance.ref(destination).child('file/');
           await ref.putFile(photo!);
           String url = await ref.getDownloadURL();
-          print(url);
           downloadUrls.add(url);
           return url;
         } catch (e) {
@@ -113,7 +112,6 @@ class _EditScreenState extends State<EditScreen> {
 
     postCar() async {
       final User? user = await auth.currentUser;
-      print(args.id);
       carsRef.doc(args.id).update({
         'brand': brandDateLocation["brand"],
         'model': brandDateLocation["model"],

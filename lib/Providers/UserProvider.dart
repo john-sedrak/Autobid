@@ -16,7 +16,6 @@ class UserProvider with ChangeNotifier {
 
   void fetchUser() async {
     try {
-      print("wow");
       var document = await FirebaseFirestore.instance
           .collection("Users")
           .doc(auth.currentUser!.uid)
@@ -37,7 +36,6 @@ class UserProvider with ChangeNotifier {
   }
 
   UserModel? get getUser {
-    print("user: " + _user!.name);
     if (_user == null) fetchUser();
     return _user;
   }

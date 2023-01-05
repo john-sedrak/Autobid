@@ -23,15 +23,9 @@ exports.messageNotification = functions.firestore
       return admin.messaging().sendToDevice(
           receiverToken,
           {
-            notification: {
+            data: {
               title: `New message from ${senderSnapshot.get("name")}`,
               body: snapshot.get("content"),
-              clickAction: "FLUTTER_NOTIFICATION_CLICK",
-            },
-            data: {
-              click_action: "FLUTTER_NOTIFICATION_CLICK",
-              sound: "default",
-              status: "done",
               screen: "/messages",
               senderRef: senderSnapshot.ref.path,
             },
@@ -62,14 +56,10 @@ exports.outBidNotification = functions.firestore
       admin.messaging().sendToDevice(
           bidderToken,
           {
-            notification: {
+            data: {
               title: `You lost your bid for the ${change.after.get("brand")} `+
                     `${change.after.get("model")}!`,
               body: `Reclaim this car by bidding higher than ${newBid} EGP.`,
-              clickAction: "FLUTTER_NOTIFICATION_CLICK",
-            },
-            data: {
-              click_action: "FLUTTER_NOTIFICATION_CLICK",
               screen: "/bidRoot",
               carId: context.params.carID,
             },
@@ -79,14 +69,10 @@ exports.outBidNotification = functions.firestore
       admin.messaging().sendToDevice(
           sellerToken,
           {
-            notification: {
+            data: {
               title: `The bid for your ${change.after.get("brand")} `+
                     `${change.after.get("model")} has increased!`,
               body: `The current bid is ${newBid} EGP.`,
-              clickAction: "FLUTTER_NOTIFICATION_CLICK",
-            },
-            data: {
-              click_action: "FLUTTER_NOTIFICATION_CLICK",
               screen: "/myListingRoute",
               carId: context.params.carID,
             },

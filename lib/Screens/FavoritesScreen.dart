@@ -176,7 +176,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
 
     final docRef = FirebaseFirestore.instance.collection('Users').doc(userId);
 
-    docRef.update({"favorites": favoriteIds}).then((value) => print("removed"));
+    docRef.update({"favorites": favoriteIds});
     loaded--;
   }
 

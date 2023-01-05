@@ -258,8 +258,6 @@ class CarDetailsState extends State<CarDetails> {
 
                       widget.brandDateLocation["date"] = pickedDate;
                     });
-                  } else {
-                    print("Date is not selected");
                   }
                 }),
             DropdownButtonFormField(

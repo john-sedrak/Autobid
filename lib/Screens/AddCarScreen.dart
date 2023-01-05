@@ -50,7 +50,6 @@ class _AddCarScreenState extends State<AddCarScreen> {
         final ref = FirebaseStorage.instance.ref(destination).child('file/');
         await ref.putFile(photo!);
         String url = await ref.getDownloadURL();
-        print(url);
         downloadUrls.add(url);
         return url;
       } catch (e) {

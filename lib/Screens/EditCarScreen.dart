@@ -102,7 +102,6 @@ class _EditScreenState extends State<EditScreen> {
           final ref = FirebaseStorage.instance.ref(destination).child('file/');
           await ref.putFile(photo!);
           String url = await ref.getDownloadURL();
-          print(url);
           downloadUrls.add(url);
           return url;
         } catch (e) {

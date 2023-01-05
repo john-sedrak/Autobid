@@ -113,6 +113,8 @@ class _FavoriteCardState extends State<FavoriteCard> {
                             "${widget.car.brand} ${widget.car.model} ${widget.car.year.toString()}",
                             style: const TextStyle(
                                 fontSize: 18, fontWeight: FontWeight.bold),
+                            overflow: TextOverflow.clip,
+                            maxLines: 1,
                           ),
                           Padding(
                               padding: const EdgeInsets.only(top: 10),
@@ -144,10 +146,12 @@ class _FavoriteCardState extends State<FavoriteCard> {
                                                       ''
                                                   ? '${widget.car.startingPrice.round()} EGP'
                                                   : '${widget.car.currentBid.round()} EGP'),
+                                              overflow: TextOverflow.clip,
+                                              maxLines: 1,
                                               style: const TextStyle(
-                                                  fontSize: 14,
-                                                  fontWeight: FontWeight.bold,
-                                                  overflow: TextOverflow.fade)),
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.bold,
+                                              )),
                                           Text(
                                               'Until ${DateFormat('dd-MM-yy').format(widget.car.validUntil)}',
                                               style: const TextStyle(

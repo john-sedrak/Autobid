@@ -76,8 +76,8 @@ class LocalNotificationService {
               arguments: {'otherChatter': otherChatter});
         }
       });
-    } else if (message.data['screen'] == '/bidRoot') {
-        String carId = message.data['carId'];
+    } else if (message['screen'] == '/bidRoot') {
+        String carId = message['carId'];
         FirebaseFirestore.instance.doc("Cars/$carId").get().then((value) {
           Map<String, dynamic> carMap = value.data() as Map<String, dynamic>;
           Car car = Utils.mapToCar(carId, carMap);
@@ -90,8 +90,8 @@ class LocalNotificationService {
                 arguments: {'car': car, 'isExpanded': true});
           }
         });
-      } else if (message.data['screen'] == "/myListingRoute") {
-        String carId = message.data['carId'];
+      } else if (message['screen'] == "/myListingRoute") {
+        String carId = message['carId'];
         FirebaseFirestore.instance.doc("Cars/$carId").get().then((value) {
           Map<String, dynamic> carMap = value.data() as Map<String, dynamic>;
           Car car = Utils.mapToCar(carId, carMap);

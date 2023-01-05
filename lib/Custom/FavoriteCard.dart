@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:autobid/Classes/Car.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -36,6 +38,41 @@ class _FavoriteCardState extends State<FavoriteCard> {
         RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},');
   }
 
+  bool ActiveConnection = false;
+  String T = "";
+  Future CheckUserConnection() async {
+    try {
+      final result = await InternetAddress.lookup('google.com');
+      if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+        setState(() {
+          ActiveConnection = true;
+          T = "Turn off the data and repress again";
+        });
+      }
+    } on SocketException catch (_) {
+      setState(() {
+        ActiveConnection = false;
+        T = "Turn On the data and repress again";
+      });
+    }
+  }
+
+  Image getImage(String url, {double width = 180, double height = 180}) {
+    try {
+      return Image.network(url,
+          fit: BoxFit.cover,
+          height: height,
+          width: width,
+          errorBuilder: (context, error, stackTrace) => Image.asset(
+              "lib/Assets/placeholder.jpg",
+              height: 180,
+              fit: BoxFit.cover));
+    } on SocketException catch (_) {
+      return Image.asset("lib/Assets/placeholder.jpg",
+          height: 180, fit: BoxFit.cover);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     bool bidExpired = DateTime.now().isAfter(widget.car.validUntil);
@@ -58,13 +95,10 @@ class _FavoriteCardState extends State<FavoriteCard> {
                     borderRadius: BorderRadius.only(
                         topLeft: Radius.circular(15),
                         bottomLeft: Radius.circular(15)),
-                    child: Image.network(
-                      widget.car.carImagePaths.isEmpty
-                          ? "https://craftsnippets.com/articles_images/placeholder/placeholder.jpg"
-                          : widget.car.carImagePaths[0],
-                      height: 180,
-                      fit: BoxFit.cover,
-                    ),
+                    child: widget.car.carImagePaths.length > 0
+                        ? getImage(widget.car.carImagePaths[0])
+                        : Image.asset("lib/Assets/placeholder.jpg",
+                            height: 180, fit: BoxFit.cover),
                   ),
                 ),
                 Expanded(

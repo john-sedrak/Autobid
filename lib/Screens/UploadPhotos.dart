@@ -11,7 +11,8 @@ import 'package:uri_to_file/uri_to_file.dart';
 
 class UploadPhotos extends StatefulWidget {
   List allPhotos;
-  UploadPhotos({required this.allPhotos});
+  List downloadUrls;
+  UploadPhotos({required this.allPhotos, required this.downloadUrls});
 
   @override
   State<UploadPhotos> createState() => _UploadPhotosState();
@@ -55,20 +56,20 @@ class _UploadPhotosState extends State<UploadPhotos> {
     });
   }
 
-  Future uploadFile() async {
-    if (_photo == null) return;
-    final fileName = basename(_photo!.path);
-    final destination = 'files/$fileName';
+  // Future uploadFile() async {
+  //   if (_photo == null) return;
+  //   final fileName = basename(_photo!.path);
+  //   final destination = 'files/$fileName';
 
-    try {
-      final ref = FirebaseStorage.instance.ref(destination).child('file/');
-      await ref.putFile(_photo!);
-      String url = await ref.getDownloadURL();
-      // print(url);
-    } catch (e) {
-      print('error occured');
-    }
-  }
+  //   try {
+  //     final ref = FirebaseStorage.instance.ref(destination).child('file/');
+  //     await ref.putFile(_photo!);
+  //     String url = await ref.getDownloadURL();
+  //     // print(url);
+  //   } catch (e) {
+  //     print('error occured');
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -139,28 +140,69 @@ class _UploadPhotosState extends State<UploadPhotos> {
                                   color: Colors.grey[800], fontSize: 10),
                             ))
                       ])))
-                  : Container(
-                      decoration: BoxDecoration(
-                          color: Colors.grey[200],
-                          borderRadius: BorderRadius.circular(20)),
-                      width: 350,
-                      height: 400,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.camera_alt,
-                            color: Colors.grey[800],
-                            size: 50,
+                  : widget.downloadUrls.length > 0
+                      ? Container(
+                          padding: EdgeInsets.all(5),
+                          height: 400,
+                          width: 350,
+                          child: SingleChildScrollView(
+                              child: Column(children: [
+                            Wrap(
+                                children: widget.downloadUrls!.map((url) {
+                              return Stack(children: [
+                                /// put container first , so the icon will show stacked on top of container
+                                Container(
+                                  child: Card(
+                                    child: Container(
+                                        height: 100,
+                                        width: 100,
+                                        child: Image.network(url)),
+                                  ),
+                                ), // your card
+                                Positioned(
+                                    top: 2,
+                                    right: 0,
+                                    child: IconButton(
+                                      icon: Icon(Icons.remove_circle),
+                                      color: Colors.grey[850],
+                                      onPressed: () {
+                                        setState(() {
+                                          widget.downloadUrls.remove(url);
+                                        });
+                                      },
+                                    )),
+                              ]);
+                            }).toList()),
+                            Padding(
+                                padding: EdgeInsets.all(10),
+                                child: Text(
+                                  "Click to add more images.",
+                                  style: TextStyle(
+                                      color: Colors.grey[800], fontSize: 10),
+                                ))
+                          ])))
+                      : Container(
+                          decoration: BoxDecoration(
+                              color: Colors.grey[200],
+                              borderRadius: BorderRadius.circular(20)),
+                          width: 350,
+                          height: 400,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.camera_alt,
+                                color: Colors.grey[800],
+                                size: 50,
+                              ),
+                              Text(
+                                "Upload at least one image of the car.",
+                                style: TextStyle(
+                                    color: Colors.grey[800], fontSize: 10),
+                              )
+                            ],
                           ),
-                          Text(
-                            "Upload at least one image of the car.",
-                            style: TextStyle(
-                                color: Colors.grey[800], fontSize: 10),
-                          )
-                        ],
-                      ),
-                    ),
+                        ),
             ),
           ),
         )

@@ -85,6 +85,7 @@ class _EditScreenState extends State<EditScreen> {
             title: Text('Photos'),
             content: UploadPhotos(
               allPhotos: allPictures,
+              downloadUrls: downloadUrls,
             ),
             state: _stepState(1),
             isActive: _currentStep == 1,
@@ -129,6 +130,10 @@ class _EditScreenState extends State<EditScreen> {
       });
     }
 
+    deleteListing() async {
+      carsRef.doc(args.id).delete();
+    }
+
     void showErrorMessage(String msg) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         backgroundColor: Colors.grey.shade300,
@@ -165,32 +170,58 @@ class _EditScreenState extends State<EditScreen> {
             controlsBuilder: (BuildContext context, ControlsDetails controls) {
               return Padding(
                 padding: const EdgeInsets.symmetric(vertical: 16.0),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  mainAxisAlignment: _currentStep != 0
-                      ? MainAxisAlignment.spaceBetween
-                      : MainAxisAlignment.end,
-                  children: <Widget>[
-                    if (_currentStep != 0)
-                      OutlinedButton(
-                        style: ButtonStyle(
-                            side: MaterialStateProperty.all(
-                                BorderSide(color: Colors.pink))),
-                        onPressed: controls.onStepCancel,
-                        child: const Text(
-                          'BACK',
-                          style: TextStyle(color: Colors.pink),
+                child: Column(children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    mainAxisAlignment: _currentStep != 0
+                        ? MainAxisAlignment.spaceBetween
+                        : MainAxisAlignment.end,
+                    children: <Widget>[
+                      if (_currentStep != 0)
+                        OutlinedButton(
+                          style: ButtonStyle(
+                              side: MaterialStateProperty.all(
+                                  BorderSide(color: Colors.pink))),
+                          onPressed: controls.onStepCancel,
+                          child: const Text(
+                            'BACK',
+                            style: TextStyle(color: Colors.pink),
+                          ),
+                        ),
+                      ElevatedButton(
+                        onPressed: controls.onStepContinue,
+                        child: Text(
+                          _currentStep == 0 ? 'NEXT' : 'UPDATE',
+                          style: TextStyle(color: Colors.white),
                         ),
                       ),
-                    ElevatedButton(
-                      onPressed: controls.onStepContinue,
-                      child: Text(
-                        _currentStep == 0 ? 'NEXT' : 'UPDATE',
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    ),
-                  ],
-                ),
+                    ],
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Center(
+                        child: OutlinedButton(
+                          style: ButtonStyle(
+                              side: MaterialStateProperty.all(
+                                  BorderSide(color: Colors.red.shade900))),
+                          onPressed: () async {
+                            await deleteListing();
+
+                            Navigator.popUntil(
+                              context,
+                              ModalRoute.withName('/'),
+                            );
+                          },
+                          child: const Text(
+                            'DELETE LISTING',
+                            style: TextStyle(color: Colors.red),
+                          ),
+                        ),
+                      )
+                    ],
+                  )
+                ]),
               );
             },
             type: StepperType.horizontal,
@@ -204,10 +235,14 @@ class _EditScreenState extends State<EditScreen> {
                     _currentStep = 0;
                   }
                 });
-              } else if (_currentStep == 1) {
+              } else if (_currentStep == 1 && (downloadUrls.length > 0) ||
+                  allPictures.length > 0) {
                 await uploadFiles();
                 await postCar();
                 Navigator.of(context).pop();
+              } else if (_currentStep == 1 &&
+                  (!(downloadUrls.length > 0) || !(allPictures.length > 0))) {
+                showErrorMessage("Add at least one image of the car.");
               }
             },
             onStepCancel: () {

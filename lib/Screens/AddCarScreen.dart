@@ -102,6 +102,7 @@ class _AddCarScreenState extends State<AddCarScreen> {
           title: Text('Photos'),
           content: UploadPhotos(
             allPhotos: allPictures,
+            downloadUrls: downloadUrls,
           ),
           state: _stepState(1),
           isActive: _currentStep == 1,

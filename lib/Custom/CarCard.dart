@@ -37,8 +37,10 @@ class _CarCardState extends State<CarCard> {
   }
 
   Future<void> getCurrentUser() async {
-    DocumentSnapshot snap =
-        await FirebaseFirestore.instance.collection('Users').doc(FirebaseAuth.instance.currentUser!.uid).get();
+    DocumentSnapshot snap = await FirebaseFirestore.instance
+        .collection('Users')
+        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .get();
     Map<String, dynamic> curMap = snap.data() as Map<String, dynamic>;
     curUser = Utils.mapToUser(userId, curMap);
     curUserObtained = true;
@@ -59,9 +61,9 @@ class _CarCardState extends State<CarCard> {
     Navigator.of(context)
         .pushNamed('/messages', arguments: {'otherChatter': sellerSnapshot});
   }
+
   void goToEditingScreen(BuildContext context) {
-    Navigator.of(context)
-        .pushNamed('/medit', arguments: {'carObj': widget.car});
+    Navigator.of(context).pushNamed('/edit', arguments: widget.car);
   }
 
   UserModel mapToUserWithoutFavorites(String id, Map<String, dynamic> map) {
@@ -309,46 +311,47 @@ class _CarCardState extends State<CarCard> {
                                         fontSize: 25, color: Colors.white),
                                   )),
                               Text('  '),
-                              curUserObtained && curUser.id == seller.id?
-                              CircleAvatar(
-                                  backgroundColor: Colors.grey,
-                                  radius: 15,
-                                  child: IconButton(
-                                      icon: const Icon(Icons.edit,
-                                          color: Colors.white),
-                                      onPressed: () {
-                                        if (_userLoaded) {
-                                          goToEditingScreen(context);
-                                        }
-                                      },
-                                      iconSize: 15)):
-                              CircleAvatar(
-                                  backgroundColor: Colors.blue,
-                                  radius: 15,
-                                  child: IconButton(
-                                      icon: const Icon(Icons.chat_rounded,
-                                          color: Colors.white),
-                                      onPressed: () {
-                                        if (_userLoaded) {
-                                          goToChatScreen(context);
-                                        }
-                                      },
-                                      iconSize: 15)),
+                              curUserObtained && curUser.id == seller.id
+                                  ? CircleAvatar(
+                                      backgroundColor: Colors.grey,
+                                      radius: 15,
+                                      child: IconButton(
+                                          icon: const Icon(Icons.edit,
+                                              color: Colors.white),
+                                          onPressed: () {
+                                            if (_userLoaded) {
+                                              goToEditingScreen(context);
+                                            }
+                                          },
+                                          iconSize: 15))
+                                  : CircleAvatar(
+                                      backgroundColor: Colors.blue,
+                                      radius: 15,
+                                      child: IconButton(
+                                          icon: const Icon(Icons.chat_rounded,
+                                              color: Colors.white),
+                                          onPressed: () {
+                                            if (_userLoaded) {
+                                              goToChatScreen(context);
+                                            }
+                                          },
+                                          iconSize: 15)),
                               Text('   '),
-                              curUserObtained && curUser.id == seller.id?SizedBox.shrink():
-                              CircleAvatar(
-                                  backgroundColor: Colors.green,
-                                  radius: 15,
-                                  child: IconButton(
-                                      icon: const Icon(Icons.phone,
-                                          color: Colors.white),
-                                      onPressed: () async {
-                                        if (_userLoaded) {
-                                          Utils.dialPhoneNumber(
-                                              seller.phoneNumber);
-                                        }
-                                      },
-                                      iconSize: 15)),
+                              curUserObtained && curUser.id == seller.id
+                                  ? SizedBox.shrink()
+                                  : CircleAvatar(
+                                      backgroundColor: Colors.green,
+                                      radius: 15,
+                                      child: IconButton(
+                                          icon: const Icon(Icons.phone,
+                                              color: Colors.white),
+                                          onPressed: () async {
+                                            if (_userLoaded) {
+                                              Utils.dialPhoneNumber(
+                                                  seller.phoneNumber);
+                                            }
+                                          },
+                                          iconSize: 15)),
                             ],
                           ),
                         ),

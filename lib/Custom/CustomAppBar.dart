@@ -17,23 +17,24 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
         automaticallyImplyLeading: false,
         leading: Builder(
           builder: (BuildContext context) {
-            if (Navigator.of(context).canPop()) {
-              return Container(
-                child: IconButton(alignment: Alignment.topCenter,
-                  icon: const Icon(Icons.arrow_back),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  tooltip: MaterialLocalizations.of(context).openAppDrawerTooltip,
-                ),
-              );
-            }
-            else if (Scaffold.of(context).hasDrawer){
+            
+            if (Scaffold.of(context).hasDrawer){
               return Container(
                 child: IconButton(alignment: Alignment.topCenter,
                   icon: const Icon(Icons.menu),
                   onPressed: () {
                     Scaffold.of(context).openDrawer();
+                  },
+                  tooltip: MaterialLocalizations.of(context).openAppDrawerTooltip,
+                ),
+              );
+            }
+            else if (Navigator.of(context).canPop()) {
+              return Container(
+                child: IconButton(alignment: Alignment.topCenter,
+                  icon: const Icon(Icons.arrow_back),
+                  onPressed: () {
+                    Navigator.of(context).pop();
                   },
                   tooltip: MaterialLocalizations.of(context).openAppDrawerTooltip,
                 ),

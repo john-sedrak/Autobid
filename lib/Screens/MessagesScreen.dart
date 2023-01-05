@@ -7,6 +7,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+import '../Services/local_notification_service.dart';
+
 class MessagesScreen extends StatefulWidget {
   @override
   State<MessagesScreen> createState() => _MessagesScreenState();
@@ -24,7 +26,8 @@ class _MessagesScreenState extends State<MessagesScreen> {
   DocumentReference<Map<String, dynamic>> userRef = FirebaseFirestore.instance
       .doc('Users/${FirebaseAuth.instance.currentUser!.uid}');
 
-  Future<DocumentSnapshot<Map<String, dynamic>>> createOrRetrieveChat(DocumentSnapshot otherChatter) async {
+  Future<DocumentSnapshot<Map<String, dynamic>>> createOrRetrieveChat(
+      DocumentSnapshot otherChatter) async {
     // RETRIEVING
     var myFetchedChats = await FirebaseFirestore.instance
         .collection('Chats')
@@ -58,6 +61,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
     print('disposing');
 
     chatRef.update({'unread.${userRef.id}': 0});
+    LocalNotificationService.setChatContext(null);
     super.dispose();
   }
 
@@ -65,6 +69,9 @@ class _MessagesScreenState extends State<MessagesScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      LocalNotificationService.setChatContext(context);
+    });
   }
 
   @override

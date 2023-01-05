@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:autobid/Providers/UserProvider.dart';
 import 'package:autobid/Screens/AuthenticationScreens/LoginScreen.dart';
 import 'package:autobid/Screens/AuthenticationScreens/WelcomeScreen.dart';
@@ -7,19 +9,48 @@ import 'package:autobid/Screens/AddCarScreen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:loading_indicator/loading_indicator.dart';
 import 'Screens/TabControllerSceen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
+import 'Services/local_notification_service.dart';
 
 void main(List<String> args) {
+  WidgetsFlutterBinding.ensureInitialized();
+  LocalNotificationService.setup();
   runApp(MyApp());
-  FirebaseMessaging.onBackgroundMessage(background_notif_handler);
+  FirebaseMessaging.onBackgroundMessage(notifHandler);
 }
 
-Future<void> background_notif_handler(RemoteMessage message) async {
+Future<void> notifHandler(RemoteMessage message) async {
 //await Firebase.initializeApp();
-  print("Handling a background message: ${message.data}");
+  print("Handling message: ${message.data}");
+
+  print(LocalNotificationService.chatContext);
+  if (LocalNotificationService.chatContext != null) {
+  var routeArgs = ModalRoute.of(LocalNotificationService.chatContext!)!.settings.arguments
+      as Map<String, dynamic>;
+      print(message.data['senderRef']);
+      print(routeArgs['otherChatter'].reference.path);
+  if (routeArgs['otherChatter'] != null &&
+      message.data['senderRef'] == routeArgs['otherChatter'].reference.path) {
+    return;
+  }
+  print(routeArgs['otherChatterRef']);
+  if (routeArgs['otherChatterRef'] != null &&
+      message.data['senderRef'] == routeArgs['otherChatterRef']) {
+    return;
+  }
+}
+
+  LocalNotificationService.localNotificationService.show(
+    0,
+    message.data['title'],
+    message.data['body'],
+    LocalNotificationService.platformChannelSpecifics,
+    payload: jsonEncode(message.data)
+  );
 }
 
 class MyApp extends StatefulWidget {
@@ -57,9 +88,7 @@ class _MyAppState extends State<MyApp> {
       auth = FirebaseAuth.instance;
       var fbm = FirebaseMessaging.instance;
       fbm.requestPermission();
-      FirebaseMessaging.onMessage.listen((message) {
-        print(message.data.toString());
-      });
+      FirebaseMessaging.onMessage.listen(notifHandler);
     });
     super.initState();
   }
@@ -102,6 +131,8 @@ class _MyAppState extends State<MyApp> {
                   '/messages': (context) => MessagesScreen(),
                 }),
           )
-        : Container(color: Colors.grey.shade300,);
+        : Container(
+            color: Colors.grey.shade300,
+          );
   }
 }

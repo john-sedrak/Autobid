@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 
+import '../Services/local_notification_service.dart';
 import 'ChatsScreen.dart';
 import 'ExploreScreen.dart';
 import 'FavoritesScreen.dart';
@@ -46,26 +47,12 @@ class _TabControllerScreenState extends State<TabControllerScreen> {
   @override
   void initState() {
     // TODO: implement initState
-    FirebaseMessaging.onMessageOpenedApp.listen((message) {
-      print('opened notification');
 
-      if (message.data['screen'] == '/messages') {
-        FirebaseFirestore.instance
-            .doc(message.data['senderRef'])
-            .get()
-            .then((otherChatter) {
-          if (Navigator.canPop(context)) {
-            Navigator.of(context).pushReplacementNamed(message.data['screen'],
-                arguments: {'otherChatter': otherChatter});
-          } else {
-            Navigator.of(context).pushNamed(message.data['screen'],
-                arguments: {'otherChatter': otherChatter});
-          }
-        });
-      }
-    });
     super.initState();
-  }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      LocalNotificationService.setContext(context);
+    });
+}
 
   @override
   Widget build(BuildContext context) {

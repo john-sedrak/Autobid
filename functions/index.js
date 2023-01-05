@@ -23,13 +23,9 @@ exports.messageNotification = functions.firestore
       return admin.messaging().sendToDevice(
           receiverToken,
           {
-            notification: {
+            data: {
               title: `New message from ${senderSnapshot.get("name")}`,
               body: snapshot.get("content"),
-              clickAction: "FLUTTER_NOTIFICATION_CLICK",
-            },
-            data: {
-              click_action: "FLUTTER_NOTIFICATION_CLICK",
               sound: "default",
               status: "done",
               screen: "/messages",

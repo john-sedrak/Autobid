@@ -67,7 +67,7 @@ class CarDetailsState extends State<CarDetails> {
   String getPureModelName(String modelName, String brand) {
     if(modelName.contains('Alfa Romeo') || modelName.contains("Aston Martin") || modelName.contains("Great Wall")
         || modelName.contains("Land Rover") || modelName.contains("Magna Steyr")){
-          return modelName.substring(secondIndexOf(modelName,' '));
+          return modelName.substring(secondIndexOf(modelName,' ')+1);
         }
     if (modelName.contains(' ')) {
       if (brand == (modelName.substring(0, modelName.indexOf(' ')))) {

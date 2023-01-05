@@ -97,7 +97,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
   String getPureModelName(String modelName) {
     if(modelName.contains('Alfa Romeo') || modelName.contains("Aston Martin") || modelName.contains("Great Wall")
         || modelName.contains("Land Rover") || modelName.contains("Magna Steyr")){
-          return modelName.substring(secondIndexOf(modelName,' '));
+          return modelName.substring(secondIndexOf(modelName,' ')+1);
         }
     if (modelName.contains(' ')) {
       if (listOfBrands

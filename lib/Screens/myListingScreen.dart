@@ -173,7 +173,9 @@ class _BiddingScreenState extends State<MyListingScreen> {
             )));
   }
 
-  void goToEditPage() {}
+  void goToEditPage() {
+    Navigator.of(context).pushNamed('/edit', arguments: carObj);
+  }
 
   FadeInImage getImage(String url, {double width = 180, double height = 180}) {
     return FadeInImage.assetNetwork(

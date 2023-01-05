@@ -86,6 +86,16 @@ class _ExploreScreenState extends State<ExploreScreen> {
     });
   }
 
+  String getPureModelName(String modelName) {
+    if (modelName.contains(' ')) {
+      if (listOfBrands
+          .contains(modelName.substring(0, modelName.indexOf(' ')))) {
+        return modelName.substring(modelName.indexOf(' ') + 1);
+      }
+    }
+    return modelName;
+  }
+
   void updateModelList(List<dynamic> brands) {
     List<dynamic> modelList = [];
 
@@ -282,7 +292,8 @@ class _ExploreScreenState extends State<ExploreScreen> {
                                               borderRadius:
                                                   BorderRadius.circular(10)),
                                           items: listOfModels
-                                              .map((e) => MultiSelectItem(e, e))
+                                              .map((e) => MultiSelectItem(
+                                                  getPureModelName(e), e))
                                               .toList(),
                                           initialValue: queryModels,
                                           onConfirm: (list) {

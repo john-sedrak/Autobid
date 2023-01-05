@@ -58,7 +58,6 @@ class _MessagesScreenState extends State<MessagesScreen> {
 
   @override
   void dispose() {
-
     chatRef.update({'unread.${userRef.id}': 0});
     LocalNotificationService.setChatContext(null);
     super.dispose();
@@ -205,8 +204,12 @@ class _MessagesScreenState extends State<MessagesScreen> {
           'receiver': otherChatter.reference,
           'timestamp': Timestamp.now()
         });
-        chatSnapshot.reference
-            .update({"unread.${otherChatter.id}": FieldValue.increment(1)});
+        chatSnapshot.reference.update({
+          "unread.${otherChatter.id}": FieldValue.increment(1),
+          "latestTextTime": Timestamp.now(),
+          "latestTextContent": messageController.text,
+          "latestTextSender": userRef,
+        });
         setState(() {
           messageController.clear();
         });

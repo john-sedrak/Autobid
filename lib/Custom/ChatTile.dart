@@ -117,7 +117,7 @@ class _ChatTileState extends State<ChatTile> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Container(
-                            padding: EdgeInsets.only(right: 5, left: 5),
+                            padding: EdgeInsets.only(right: 5, left: 5, top: 1),
                             height: 20,
                             constraints:
                                 BoxConstraints(maxWidth: 50, minWidth: 20),

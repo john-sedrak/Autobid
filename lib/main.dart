@@ -31,26 +31,30 @@ Future<void> notifHandler(RemoteMessage message) async {
 //await Firebase.initializeApp();
   print("Handling message: ${message.data}");
 
+  print(LocalNotificationService.chatContext);
   if (LocalNotificationService.chatContext != null) {
-  var routeArgs = ModalRoute.of(LocalNotificationService.chatContext!)!.settings.arguments
-      as Map<String, dynamic>;
-  if (routeArgs['otherChatter'] != null &&
-      message.data['senderRef'] == routeArgs['otherChatter'].reference.path) {
-    return;
+    var routeArgs = ModalRoute.of(LocalNotificationService.chatContext!)!
+        .settings
+        .arguments as Map<String, dynamic>;
+    print(message.data['senderRef']);
+    print(routeArgs['otherChatter']);
+    if (routeArgs['otherChatter'] != null &&
+        message.data['senderRef'] == routeArgs['otherChatter'].reference.path) {
+      return;
+    }
+    print(routeArgs['otherChatterRef']);
+    if (routeArgs['otherChatterRef'] != null &&
+        message.data['senderRef'] == routeArgs['otherChatterRef']) {
+      return;
+    }
   }
-  if (routeArgs['otherChatterRef'] != null &&
-      message.data['senderRef'] == routeArgs['otherChatterRef']) {
-    return;
-  }
-}
 
   LocalNotificationService.localNotificationService.show(
-    0,
-    message.data['title'],
-    message.data['body'],
-    LocalNotificationService.platformChannelSpecifics,
-    payload: jsonEncode(message.data)
-  );
+      0,
+      message.data['title'],
+      message.data['body'],
+      LocalNotificationService.platformChannelSpecifics,
+      payload: jsonEncode(message.data));
 }
 
 class MyApp extends StatefulWidget {

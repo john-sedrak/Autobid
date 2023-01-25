@@ -52,16 +52,14 @@ class _ChatsScreenState extends State<ChatsScreen> {
   }
 
   void populateFetchedChatLists(var chats) {
-    if (chats.length != chatMaps.length||chatMaps.isEmpty) {
-      chatMaps.clear();
-      for (int i = 0; i < chats.length; i++) {
-        var element = chats[i];
+    chatMaps.clear();
+    for (int i = 0; i < chats.length; i++) {
+      var element = chats[i];
 
-        chatMaps.add(ChatTile(
-            key: ValueKey(element.reference.path),
-            chatSnapshot: element,
-            otherChatterFuture: getChatterFuture(element)));
-      }
+      chatMaps.add(ChatTile(
+          key: ValueKey(element.reference.path),
+          chatSnapshot: element,
+          otherChatterFuture: getChatterFuture(element)));
     }
     if (searchController.text.trim().isEmpty) {
       searchResults.clear();
@@ -76,6 +74,7 @@ class _ChatsScreenState extends State<ChatsScreen> {
     var chatsInstance = FirebaseFirestore.instance
         .collection("Chats")
         .where('chatters', arrayContains: userRef)
+        .orderBy('latestTextTime', descending: true)
         .snapshots();
 
     if (_error) {

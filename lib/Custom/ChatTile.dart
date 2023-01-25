@@ -23,7 +23,7 @@ class _ChatTileState extends State<ChatTile> {
   DocumentReference<Map<String, dynamic>> userRef = FirebaseFirestore.instance
       .doc('Users/${FirebaseAuth.instance.currentUser!.uid}');
   late DocumentSnapshot<Map<String, dynamic>> otherChatter;
-  late Map<String, dynamic> latestText;
+  Map<String, dynamic> latestText = {};
 
   void navigateToChat() {
     // Future.delayed(Duration(milliseconds: 500), (){
@@ -52,31 +52,23 @@ class _ChatTileState extends State<ChatTile> {
         setState(() {
           _unreadCount = event.get('unread.${userRef.id}');
         });
+        setState(() {
+          try {
+          latestText = {
+            'sender': event.get('latestTextSender'),
+            'timestamp': event.get('latestTextTime'),
+            'content': event.get('latestTextContent'),
+          };
+          _latestTextFetched = true;
+        } catch (e) {
+          print(e);
+          _latestTextFetched = false;
+        }
+        });
+        
       }
     });
-    widget.chatSnapshot.reference.collection('Texts').snapshots().listen(
-      (event) {
-        if (mounted) {
-          widget.chatSnapshot.reference
-              .collection('Texts')
-              .orderBy('timestamp', descending: true)
-              .snapshots()
-              .first
-              .then(
-            (value) {
-              setState(() {
-                if (value.docs.isNotEmpty) {
-                  latestText = value.docs.first.data();
-                  _latestTextFetched = true;
-                } else {
-                  latestText = {};
-                }
-              });
-            },
-          );
-        }
-      },
-    );
+
     super.initState();
   }
 
@@ -125,7 +117,7 @@ class _ChatTileState extends State<ChatTile> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Container(
-                            padding: EdgeInsets.only(right: 5, left: 5),
+                            padding: EdgeInsets.only(right: 5, left: 5, top: 1),
                             height: 20,
                             constraints:
                                 BoxConstraints(maxWidth: 50, minWidth: 20),
